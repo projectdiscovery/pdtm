@@ -8,7 +8,6 @@ require (
 	github.com/projectdiscovery/folderutil v0.0.0-20220215113126-add60a1e8e08
 	github.com/projectdiscovery/goflags v0.0.8-0.20220323170412-1721b7db8fa0
 	github.com/projectdiscovery/gologger v1.1.4
-	github.com/projectdiscovery/sliceutil v0.0.0-20220225084130-8392ac12fa6d
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a
 )
 
@@ -24,6 +23,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/projectdiscovery/stringsutil v0.0.0-20210804142656-fd3c28dbaafe // indirect
+	github.com/stretchr/testify v1.7.1 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	google.golang.org/appengine v1.6.6 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect

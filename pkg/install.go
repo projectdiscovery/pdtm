@@ -12,40 +12,23 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
-
-	"github.com/google/go-github/github"
 )
 
-var ErrIsInstalled = errors.New("already present")
+var ErrIsInstalled = errors.New("already installed")
+var ErrIsUpToDate = errors.New("already up to date")
 
 // Install installs given tool at path
 func Install(tool Tool, path string) (string, error) {
 	if path, _ := exec.LookPath(tool.Name); path != "" {
 		return "", ErrIsInstalled
 	}
-	githubClient := GithubClient()
-
-	releases, _, err := githubClient.Repositories.ListReleases(context.Background(), Organization, tool.Repo, &github.ListOptions{
-		PerPage: 1,
-	})
-	if err != nil {
-		return "", err
-	}
-	if len(releases) == 0 {
-		return "", errors.New("could not get latest release")
-
-	}
-
-	assets, _, err := githubClient.Repositories.ListReleaseAssets(context.Background(), Organization, tool.Repo, *releases[0].ID, nil)
-	if err != nil {
-		return "", err
-	}
 
 	builder := &strings.Builder{}
 	builder.WriteString(tool.Name)
 	builder.WriteString("_")
-	builder.WriteString(strings.TrimPrefix(releases[0].GetTagName(), "v"))
+	builder.WriteString(strings.TrimPrefix(tool.Version, "v"))
 	builder.WriteString("_")
 	if runtime.GOOS == "darwin" {
 		builder.WriteString("macOS")
@@ -55,16 +38,16 @@ func Install(tool Tool, path string) (string, error) {
 	builder.WriteString("_")
 	builder.WriteString(runtime.GOARCH)
 	builder.WriteString(".zip")
-	var id int64
-	for _, asset := range assets {
-		if *asset.Name == builder.String() {
-			id = *asset.ID
+	var id int
+	for asset, assetID := range tool.Assets {
+		if asset == builder.String() {
+			id, _ = strconv.Atoi(assetID)
 			break
 		}
 	}
 	builder.Reset()
 
-	_, rdurl, err := githubClient.Repositories.DownloadReleaseAsset(context.Background(), Organization, tool.Repo, id)
+	_, rdurl, err := GithubClient().Repositories.DownloadReleaseAsset(context.Background(), Organization, tool.Repo, int64(id))
 	if err != nil {
 		return "", err
 	}
@@ -123,5 +106,5 @@ func Install(tool Tool, path string) (string, error) {
 		dstFile.Close()
 		fileInArchive.Close()
 	}
-	return releases[0].GetTagName(), nil
+	return tool.Version, nil
 }

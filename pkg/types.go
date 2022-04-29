@@ -3,6 +3,8 @@ package pkg
 const Organization = "projectdiscovery"
 
 type Tool struct {
-	Name string `json:"name"`
-	Repo string `json:"repo"`
+	Name    string            `jðson:"name"`
+	Repo    string            `json:"repo"`
+	Version string            `json:"version"`
+	Assets  map[string]string `json:"assets"`
 }

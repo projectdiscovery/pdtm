@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/projectdiscovery/fileutil"
 	"github.com/projectdiscovery/folderutil"
 	"github.com/projectdiscovery/goflags"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/levels"
+	"github.com/projectdiscovery/pdtm/pkg/path"
 )
 
 var (
@@ -29,6 +31,8 @@ type Options struct {
 	UpdateAll  bool
 	RemoveAll  bool
 
+	sourceURL string
+
 	Verbose bool
 	Silent  bool
 	Version bool
@@ -39,15 +43,17 @@ func ParseOptions() *Options {
 	var err error
 	home, err := os.UserHomeDir()
 	if err != nil {
-		os.Exit(1)
+		gologger.Fatal().Msgf("Failed to get user home directory: %s", err)
 	}
+	defaultPath := filepath.Join(home, ".projectdiscovery")
 	options := &Options{}
 	flagSet := goflags.NewFlagSet()
 	flagSet.SetDescription(`projectdiscovery foss tool manager`)
 
 	flagSet.CreateGroup("config", "Config",
 		flagSet.StringVar(&options.ConfigFile, "config", defaultConfigLocation, "flag configuration file"),
-		flagSet.StringVar(&options.Path, "path", filepath.Join(home, "go/bin"), "path"),
+		flagSet.StringVar(&options.Path, "path", defaultPath, "path"),
+		flagSet.StringVar(&options.sourceURL, "source", "http://localhost:8080", "pdtm store URL"),
 	)
 
 	flagSet.CreateGroup("install", "Install",
@@ -93,6 +99,17 @@ func ParseOptions() *Options {
 	err = options.validateOptions()
 	if err != nil {
 		gologger.Fatal().Msgf("pdtm error: %s\n", err)
+	}
+
+	if options.Path == defaultPath {
+		//&& !strings.Contains(os.Getenv("PATH"), filepath.Join(home, defaultPath))
+		pathVars := strings.Split(os.Getenv("PATH"), ":")
+		for _, pathVar := range pathVars {
+			if strings.EqualFold(pathVar, defaultPath) {
+				return options
+			}
+		}
+		path.SetENV(defaultPath)
 	}
 
 	return options
