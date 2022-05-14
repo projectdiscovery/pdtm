@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/logrusorgru/aurora/v3"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/pdtm/pkg"
 )
@@ -135,7 +136,7 @@ func installedVersion(i int, tool pkg.Tool) string {
 	if err != nil {
 		var notFoundError *exec.Error
 		if errors.As(err, &notFoundError) {
-			msg = "not installed"
+			msg = aurora.Red("not installed").String()
 		} else {
 			msg = "version not found"
 		}
@@ -145,12 +146,12 @@ func installedVersion(i int, tool pkg.Tool) string {
 	if len(installedVersion) == 2 {
 		installedVersionString := strings.TrimPrefix(strings.TrimSpace(string(installedVersion[1])), "v")
 		if strings.Contains(tool.Version, installedVersionString) {
-			msg = "latest"
+			msg = aurora.Green("installed - latest").String()
 		} else {
-			msg = fmt.Sprintf("outdated - %s", bytes.TrimSpace(installedVersion[1]))
+			msg = aurora.Yellow("installed - outdated").String()
 		}
 	}
-	fmt.Printf("%d. %s - %s (%s)\n", i+1, tool.Name, tool.Version, msg)
+	fmt.Printf("%d. %s (%s)\n", i+1, tool.Name, msg)
 	return msg
 }
 
