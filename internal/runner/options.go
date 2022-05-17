@@ -53,7 +53,7 @@ func ParseOptions() *Options {
 	flagSet.CreateGroup("config", "Config",
 		flagSet.StringVar(&options.ConfigFile, "config", defaultConfigLocation, "flag configuration file"),
 		flagSet.StringVar(&options.Path, "path", defaultPath, "path"),
-		flagSet.StringVar(&options.sourceURL, "source", "http://localhost:8080", "pdtm store URL"),
+		flagSet.StringVar(&options.sourceURL, "source", "https://pdtm.projectdiscovery.io", "pdtm store URL"),
 	)
 
 	flagSet.CreateGroup("install", "Install",
