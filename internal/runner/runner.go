@@ -151,7 +151,7 @@ func installedVersion(i int, tool pkg.Tool) string {
 			msg = aurora.Yellow("installed - outdated").String()
 		}
 	}
-	fmt.Printf("%d. %s (%s)\n", i+1, tool.Name, msg)
+	fmt.Printf("%d. %s (%s)\n", i, tool.Name, msg)
 	return msg
 }
 
