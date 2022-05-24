@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -27,12 +28,27 @@ func NewRunner(options *Options) (*Runner, error) {
 	}, nil
 }
 
+// Run the instance
 func (r *Runner) Run() error {
+	toolList, err := fetchToolList()
 
-	toolList, err := fetchToolList(r.options.sourceURL)
-	if err != nil {
+	// if toolList is not nil save/update the cache
+	// else fetch from cache file
+	if toolList != nil {
+		go UpdateCache(toolList)
+	} else {
+		toolList, err = FetchFromCache()
+		if err != nil {
+			return errors.New("pdtm api is down, please try again later")
+		}
+		if toolList != nil {
+			gologger.Warning().Msg("pdtm api is down, using cached information while we fix the issue \n\n")
+		}
+	}
+	if toolList == nil && err != nil {
 		return err
 	}
+
 	switch {
 	case r.options.InstallAll:
 		for _, tool := range toolList {
@@ -49,9 +65,9 @@ func (r *Runner) Run() error {
 	}
 
 	for _, tool := range r.options.Install {
-		if t, ok := toolList[tool]; ok {
+		if i, ok := contains(toolList, tool); ok {
 			gologger.Info().Msgf("trying to install %s", tool)
-			if version, err := pkg.Install(t, r.options.Path); err != nil {
+			if version, err := pkg.Install(toolList[i], r.options.Path); err != nil {
 				if err == pkg.ErrIsInstalled {
 					gologger.Info().Msgf("%s: %s", tool, err)
 				} else {
@@ -64,23 +80,23 @@ func (r *Runner) Run() error {
 
 	}
 	for _, tool := range r.options.Update {
-		if t, ok := toolList[tool]; ok {
-			gologger.Info().Msgf("trying to udpate %s", tool)
-			if version, err := pkg.Update(t, r.options.Path); err != nil {
+		if i, ok := contains(toolList, tool); ok {
+			gologger.Info().Msgf("trying to update %s", tool)
+			if version, err := pkg.Update(toolList[i], r.options.Path); err != nil {
 				if err == pkg.ErrIsUpToDate {
 					gologger.Info().Msgf("%s: %s", tool, err)
 				} else {
 					gologger.Error().Msgf("error while updating %s: %s", tool, err)
 				}
 			} else {
-				gologger.Info().Msgf("Updated %s %s", tool, version)
+				gologger.Info().Msgf("Updated %s to %s(latest)", tool, version)
 			}
 		}
 	}
 	for _, tool := range r.options.Remove {
-		if t, ok := toolList[tool]; ok {
+		if i, ok := contains(toolList, tool); ok {
 			gologger.Info().Msgf("trying to remove %s", tool)
-			if err := pkg.Remove(t); err != nil {
+			if err := pkg.Remove(toolList[i]); err != nil {
 				var notFoundError *exec.Error
 				if errors.As(err, &notFoundError) {
 					gologger.Info().Msgf("%s: not found", tool)
@@ -94,27 +110,35 @@ func (r *Runner) Run() error {
 		}
 	}
 	if len(r.options.Install) == 0 && len(r.options.Update) == 0 && len(r.options.Remove) == 0 {
-		return r.ListTools()
+		return r.ListTools(toolList)
 	}
 	return nil
 }
 
-func Contains(s []pkg.Tool, e string) (int, bool) {
-	for i, a := range s {
-		if strings.EqualFold(a.Name, e) {
-			return i, true
-		}
-	}
-	return -1, false
-}
-
-//
-func (r *Runner) ListTools() error {
-	tools, err := fetchToolList(r.options.sourceURL)
+// UpdateCache creates/updates cache file
+func UpdateCache(toolList []pkg.Tool) error {
+	b, err := json.Marshal(toolList)
 	if err != nil {
-		gologger.Error().Msgf("error trying to fetch available tool list: %s", err)
 		return err
 	}
+	return ioutil.WriteFile(cacheFile, b, os.ModePerm)
+}
+
+// FetchFromCache loads tool list from cache file
+func FetchFromCache() ([]pkg.Tool, error) {
+	b, err := ioutil.ReadFile(cacheFile)
+	if err != nil {
+		return nil, err
+	}
+	var toolList []pkg.Tool
+	if err := json.Unmarshal(b, &toolList); err != nil {
+		return nil, err
+	}
+	return toolList, nil
+}
+
+// ListTools prints the list of tools
+func (r *Runner) ListTools(tools []pkg.Tool) error {
 	fmt.Print("Available ProjectDiscovery FOSS Tools\n\n")
 	var i int
 	for _, tool := range tools {
@@ -155,20 +179,35 @@ func installedVersion(i int, tool pkg.Tool) string {
 	return msg
 }
 
-func fetchToolList(sourceURL string) (map[string]pkg.Tool, error) {
-	tools := make(map[string]pkg.Tool)
-	resp, err := http.Get(fmt.Sprintf("%s/api/v1/tools", sourceURL))
+func fetchToolList() ([]pkg.Tool, error) {
+	tools := make([]pkg.Tool, 0)
+	resp, err := http.Get("http://pdtm.projectdiscovery.io/api/v1/tools")
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	if err := json.Unmarshal(body, &tools); err != nil {
-		return nil, err
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(body, &tools)
+		if err != nil {
+			return nil, err
+		}
+		return tools, nil
 	}
 	return tools, nil
+}
+
+func contains(s []pkg.Tool, toolName string) (int, bool) {
+	for i, a := range s {
+		if strings.EqualFold(a.Name, toolName) {
+			return i, true
+		}
+	}
+	return -1, false
 }
 
 // Close the runner instance
