@@ -14,9 +14,8 @@ import (
 	"github.com/projectdiscovery/pdtm/pkg/path"
 )
 
-var (
-	defaultConfigLocation = filepath.Join(folderutil.HomeDirOrDefault("."), ".config/pdtm/config.yaml")
-)
+var defaultConfigLocation = filepath.Join(folderutil.HomeDirOrDefault("."), ".config/pdtm/config.yaml")
+var cacheFile = filepath.Join(folderutil.HomeDirOrDefault("."), ".config/pdtm/cache.json")
 
 // Options contains the configuration options for tuning the enumeration process.
 type Options struct {
@@ -30,8 +29,6 @@ type Options struct {
 	InstallAll bool
 	UpdateAll  bool
 	RemoveAll  bool
-
-	sourceURL string
 
 	Verbose bool
 	Silent  bool
@@ -53,7 +50,6 @@ func ParseOptions() *Options {
 	flagSet.CreateGroup("config", "Config",
 		flagSet.StringVar(&options.ConfigFile, "config", defaultConfigLocation, "flag configuration file"),
 		flagSet.StringVar(&options.Path, "path", defaultPath, "path"),
-		flagSet.StringVar(&options.sourceURL, "source", "https://pdtm.projectdiscovery.io", "pdtm store URL"),
 	)
 
 	flagSet.CreateGroup("install", "Install",
@@ -102,7 +98,6 @@ func ParseOptions() *Options {
 	}
 
 	if options.Path == defaultPath {
-		//&& !strings.Contains(os.Getenv("PATH"), filepath.Join(home, defaultPath))
 		pathVars := strings.Split(os.Getenv("PATH"), ":")
 		for _, pathVar := range pathVars {
 			if strings.EqualFold(pathVar, defaultPath) {
