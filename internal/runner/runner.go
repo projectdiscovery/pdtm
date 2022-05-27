@@ -198,7 +198,7 @@ func fetchToolList() ([]pkg.Tool, error) {
 		}
 		return tools, nil
 	}
-	return tools, nil
+	return nil, nil
 }
 
 func contains(s []pkg.Tool, toolName string) (int, bool) {
