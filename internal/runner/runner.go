@@ -181,7 +181,7 @@ func installedVersion(i int, tool pkg.Tool) string {
 
 func fetchToolList() ([]pkg.Tool, error) {
 	tools := make([]pkg.Tool, 0)
-	resp, err := http.Get("http://pdtm.projectdiscovery.io/api/v1/tools")
+	resp, err := http.Get("https://pdtm.projectdiscovery.io/api/v1/tools")
 	if err != nil {
 		return nil, err
 	}
