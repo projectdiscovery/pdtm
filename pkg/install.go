@@ -4,7 +4,6 @@ import (
 	"archive/zip"
 	"bytes"
 	"context"
-	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -14,17 +13,25 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+
+	"github.com/projectdiscovery/gologger"
 )
 
-var ErrIsInstalled = errors.New("already installed")
-var ErrIsUpToDate = errors.New("already up to date")
-
 // Install installs given tool at path
-func Install(tool Tool, path string) (string, error) {
+func Install(tool Tool, path string) error {
 	if path, _ := exec.LookPath(tool.Name); path != "" {
-		return "", ErrIsInstalled
+		return ErrIsInstalled
 	}
+	gologger.Info().Msgf("installing %s...", tool.Name)
+	version, err := install(tool, path)
+	if err != nil {
+		return err
+	}
+	gologger.Info().Msgf("installed %s %s(latest)", tool.Name, version)
+	return nil
+}
 
+func install(tool Tool, path string) (string, error) {
 	builder := &strings.Builder{}
 	builder.WriteString(tool.Name)
 	builder.WriteString("_")

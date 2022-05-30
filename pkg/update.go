@@ -2,24 +2,38 @@ package pkg
 
 import (
 	"bytes"
+	"errors"
+	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/projectdiscovery/gologger"
 )
 
 // Update updates a given tool
-func Update(tool Tool, path string) (string, error) {
-	if isUpToDate(tool) {
-		return "", ErrIsUpToDate
-	}
-
-	if err := Remove(tool); err != nil {
-		return "", err
-	}
-	version, err := Install(tool, path)
+func Update(tool Tool, path string) error {
+	executablePath, err := exec.LookPath(tool.Name)
 	if err != nil {
-		return "", err
+		var notFoundError *exec.Error
+		if errors.As(err, &notFoundError) {
+			gologger.Info().Msgf("%s: not found", tool.Name)
+			return Install(tool, path)
+		}
+		return err
 	}
-	return version, nil
+	if isUpToDate(tool) {
+		return ErrIsUpToDate
+	}
+	gologger.Info().Msgf("updating %s...", tool.Name)
+	if err := os.Remove(executablePath); err != nil {
+		return err
+	}
+	version, err := install(tool, path)
+	if err != nil {
+		return err
+	}
+	gologger.Info().Msgf("updated %s to %s(latest)", tool.Name, version)
+	return nil
 }
 
 func isUpToDate(tool Tool) (latest bool) {

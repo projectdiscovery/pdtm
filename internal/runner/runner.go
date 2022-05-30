@@ -66,36 +66,29 @@ func (r *Runner) Run() error {
 
 	for _, tool := range r.options.Install {
 		if i, ok := contains(toolList, tool); ok {
-			gologger.Info().Msgf("trying to install %s", tool)
-			if version, err := pkg.Install(toolList[i], r.options.Path); err != nil {
+			if err := pkg.Install(toolList[i], r.options.Path); err != nil {
 				if err == pkg.ErrIsInstalled {
 					gologger.Info().Msgf("%s: %s", tool, err)
 				} else {
 					gologger.Error().Msgf("error while installing %s: %s", tool, err)
 				}
-			} else {
-				gologger.Info().Msgf("Installed %s %s", tool, version)
 			}
 		}
 
 	}
 	for _, tool := range r.options.Update {
 		if i, ok := contains(toolList, tool); ok {
-			gologger.Info().Msgf("trying to update %s", tool)
-			if version, err := pkg.Update(toolList[i], r.options.Path); err != nil {
+			if err := pkg.Update(toolList[i], r.options.Path); err != nil {
 				if err == pkg.ErrIsUpToDate {
 					gologger.Info().Msgf("%s: %s", tool, err)
 				} else {
 					gologger.Error().Msgf("error while updating %s: %s", tool, err)
 				}
-			} else {
-				gologger.Info().Msgf("Updated %s to %s(latest)", tool, version)
 			}
 		}
 	}
 	for _, tool := range r.options.Remove {
 		if i, ok := contains(toolList, tool); ok {
-			gologger.Info().Msgf("trying to remove %s", tool)
 			if err := pkg.Remove(toolList[i]); err != nil {
 				var notFoundError *exec.Error
 				if errors.As(err, &notFoundError) {
@@ -103,8 +96,6 @@ func (r *Runner) Run() error {
 				} else {
 					gologger.Error().Msgf("error while removing %s: %s", tool, err)
 				}
-			} else {
-				gologger.Info().Msgf("Removed %s", tool)
 			}
 
 		}
