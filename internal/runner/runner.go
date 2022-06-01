@@ -35,7 +35,7 @@ func (r *Runner) Run() error {
 	// if toolList is not nil save/update the cache
 	// else fetch from cache file
 	if toolList != nil {
-		go UpdateCache(toolList)
+		go UpdateCache(toolList) //nolint:errcheck
 	} else {
 		toolList, err = FetchFromCache()
 		if err != nil {
