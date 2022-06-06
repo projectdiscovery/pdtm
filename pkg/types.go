@@ -1,6 +1,14 @@
 package pkg
 
+import "errors"
+
 const Organization = "projectdiscovery"
+
+var (
+	ErrIsInstalled  = errors.New("already installed")
+	ErrIsUpToDate   = errors.New("already up to date")
+	ErrNoAssetFound = errors.New("could not find release asset for your platform")
+)
 
 type Tool struct {
 	Name    string            `jðson:"name"`
