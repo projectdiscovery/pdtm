@@ -104,7 +104,10 @@ func ParseOptions() *Options {
 				return options
 			}
 		}
-		path.SetENV(defaultPath)
+		if err := path.SetENV(defaultPath); err != nil {
+			gologger.Fatal().Msgf("Failed to set path: %s. Please add ~/.projectdiscovery to $PATH and run again", err)
+		}
+
 	}
 
 	return options
