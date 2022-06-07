@@ -11,7 +11,7 @@ var (
 )
 
 type Tool struct {
-	Name    string            `jðson:"name"`
+	Name    string            `json:"name"`
 	Repo    string            `json:"repo"`
 	Version string            `json:"version"`
 	Assets  map[string]string `json:"assets"`
