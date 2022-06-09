@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -68,7 +69,7 @@ loop:
 
 	// handle if id is zero (no asset found)
 	if id == 0 {
-		return "", ErrNoAssetFound
+		return "", fmt.Errorf(ErrNoAssetFound, runtime.GOOS, runtime.GOARCH)
 	}
 
 	_, rdurl, err := GithubClient().Repositories.DownloadReleaseAsset(context.Background(), Organization, tool.Repo, int64(id))

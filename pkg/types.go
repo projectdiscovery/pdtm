@@ -7,7 +7,7 @@ const Organization = "projectdiscovery"
 var (
 	ErrIsInstalled  = errors.New("already installed")
 	ErrIsUpToDate   = errors.New("already up to date")
-	ErrNoAssetFound = errors.New("could not find release asset for your platform")
+	ErrNoAssetFound = "could not find release asset for your platform (%s/%s)"
 )
 
 type Tool struct {
