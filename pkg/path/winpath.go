@@ -11,7 +11,7 @@ import (
 
 // sendmsg uses a syscall to broadcast the registry change so that
 // new shells will get the new PATH immediately, without a reboot
-var sendmsg func()
+var sendmsg func() // nolint
 
 // NormalizePathEntry will return the given directory path relative
 // from its absolute path to the %USERPROFILE% (home) directory.
@@ -54,15 +54,15 @@ func IndexOf(paths []string, p string) (int, error) {
 		if path == "" {
 			continue
 		}
-		if strings.ToLower(p) == strings.ToLower(path) {
+		if strings.EqualFold(strings.ToLower(p), strings.ToLower(path)) {
 			index = i
 			break
 		}
-		if strings.ToLower(abspath) == strings.ToLower(path) {
+		if strings.EqualFold(strings.ToLower(abspath), strings.ToLower(path)) {
 			index = i
 			break
 		}
-		if strings.ToLower(homepath) == strings.ToLower(path) {
+		if strings.EqualFold(strings.ToLower(homepath), strings.ToLower(path)) {
 			index = i
 			break
 		}
