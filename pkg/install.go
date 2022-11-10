@@ -117,7 +117,7 @@ func downloadTar(reader io.Reader, toolName, path string) error {
 		if err != nil {
 			return err
 		}
-		if header.FileInfo().Name() != toolName {
+		if strings.Trim(header.FileInfo().Name(), ".exe") != toolName {
 			continue
 		}
 		// if the file is not a directory, extract it
@@ -162,7 +162,7 @@ func downloadZip(reader io.Reader, toolName, path string) error {
 		return err
 	}
 	for _, f := range zipReader.File {
-		if f.Name != toolName {
+		if strings.Trim(f.Name, ".exe") != toolName {
 			continue
 		}
 		filePath := filepath.Join(path, f.Name)
