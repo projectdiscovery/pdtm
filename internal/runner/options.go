@@ -5,12 +5,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/projectdiscovery/fileutil"
-	"github.com/projectdiscovery/folderutil"
 	"github.com/projectdiscovery/goflags"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/levels"
 	"github.com/projectdiscovery/pdtm/pkg/path"
+	fileutil "github.com/projectdiscovery/utils/file"
+	folderutil "github.com/projectdiscovery/utils/folder"
 )
 
 var defaultConfigLocation = filepath.Join(folderutil.HomeDirOrDefault("."), ".config/pdtm/config.yaml")
@@ -21,9 +21,9 @@ type Options struct {
 	ConfigFile string
 	Path       string
 
-	Install goflags.NormalizedStringSlice
-	Update  goflags.NormalizedStringSlice
-	Remove  goflags.NormalizedStringSlice
+	Install goflags.StringSlice
+	Update  goflags.StringSlice
+	Remove  goflags.StringSlice
 
 	InstallAll bool
 	UpdateAll  bool
@@ -52,17 +52,17 @@ func ParseOptions() *Options {
 	)
 
 	flagSet.CreateGroup("install", "Install",
-		flagSet.NormalizedStringSliceVarP(&options.Install, "install", "i", []string{}, "install given pd-tool (comma separated)"),
+		flagSet.StringSliceVarP(&options.Install, "install", "i", []string{}, "install given pd-tool (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.BoolVarP(&options.InstallAll, "install-all", "ia", false, "install all pd-tools"),
 	)
 
 	flagSet.CreateGroup("update", "Update",
-		flagSet.NormalizedStringSliceVarP(&options.Update, "update", "u", []string{}, "update given pd-tool (comma separated)"),
+		flagSet.StringSliceVarP(&options.Update, "update", "u", []string{}, "update given pd-tool (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.BoolVarP(&options.UpdateAll, "update-all", "ua", false, "update all pd-tools"),
 	)
 
 	flagSet.CreateGroup("remove", "Remove",
-		flagSet.NormalizedStringSliceVarP(&options.Remove, "remove", "r", []string{}, "remove given pd-tool (comma separated)"),
+		flagSet.StringSliceVarP(&options.Remove, "remove", "r", []string{}, "remove given pd-tool (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.BoolVarP(&options.RemoveAll, "remove-all", "ra", false, "remove all pd-tools"),
 	)
 
