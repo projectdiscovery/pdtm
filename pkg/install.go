@@ -19,6 +19,8 @@ import (
 	"github.com/projectdiscovery/gologger"
 )
 
+var extIfFound = ".exe"
+
 // Install installs given tool at path
 func Install(tool Tool, path string) error {
 	if path, _ := exec.LookPath(tool.Name); path != "" {
@@ -39,7 +41,7 @@ func install(tool Tool, path string) (string, error) {
 	builder.WriteString("_")
 	builder.WriteString(strings.TrimPrefix(tool.Version, "v"))
 	builder.WriteString("_")
-	if runtime.GOOS == "darwin" {
+	if strings.EqualFold(runtime.GOOS, "darwin") {
 		builder.WriteString("macOS")
 	} else {
 		builder.WriteString(runtime.GOOS)
@@ -117,7 +119,7 @@ func downloadTar(reader io.Reader, toolName, path string) error {
 		if err != nil {
 			return err
 		}
-		if header.FileInfo().Name() != toolName {
+		if !strings.EqualFold(strings.TrimSuffix(header.FileInfo().Name(), extIfFound), toolName) {
 			continue
 		}
 		// if the file is not a directory, extract it
@@ -162,7 +164,7 @@ func downloadZip(reader io.Reader, toolName, path string) error {
 		return err
 	}
 	for _, f := range zipReader.File {
-		if f.Name != toolName {
+		if !strings.EqualFold(strings.TrimSuffix(f.Name, extIfFound), toolName) {
 			continue
 		}
 		filePath := filepath.Join(path, f.Name)
