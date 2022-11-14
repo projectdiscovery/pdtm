@@ -41,7 +41,7 @@ func install(tool Tool, path string) (string, error) {
 	builder.WriteString("_")
 	builder.WriteString(strings.TrimPrefix(tool.Version, "v"))
 	builder.WriteString("_")
-	if runtime.GOOS == "darwin" {
+	if strings.EqualFold(runtime.GOOS, "darwin") {
 		builder.WriteString("macOS")
 	} else {
 		builder.WriteString(runtime.GOOS)
@@ -119,7 +119,7 @@ func downloadTar(reader io.Reader, toolName, path string) error {
 		if err != nil {
 			return err
 		}
-		if strings.Trim(header.FileInfo().Name(), extIfFound) != toolName {
+		if !strings.EqualFold(strings.TrimSuffix(header.FileInfo().Name(), extIfFound), toolName) {
 			continue
 		}
 		// if the file is not a directory, extract it
@@ -164,7 +164,7 @@ func downloadZip(reader io.Reader, toolName, path string) error {
 		return err
 	}
 	for _, f := range zipReader.File {
-		if strings.Trim(f.Name, extIfFound) != toolName {
+		if !strings.EqualFold(strings.TrimSuffix(f.Name, extIfFound), toolName) {
 			continue
 		}
 		filePath := filepath.Join(path, f.Name)

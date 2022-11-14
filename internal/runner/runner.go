@@ -63,6 +63,7 @@ func (r *Runner) Run() error {
 			r.options.Remove = append(r.options.Remove, tool.Name)
 		}
 	}
+	gologger.Verbose().Msgf("using path %s", r.options.Path)
 
 	for _, tool := range r.options.Install {
 		if i, ok := contains(toolList, tool); ok {
@@ -157,7 +158,7 @@ func installedVersion(i int, tool pkg.Tool) string {
 		}
 	}
 
-	installedVersion := bytes.Split(outb.Bytes(), []byte("Current Version: "))
+	installedVersion := strings.Split(strings.ToLower(outb.String()), "current version: ")
 	if len(installedVersion) == 2 {
 		installedVersionString := strings.TrimPrefix(strings.TrimSpace(string(installedVersion[1])), "v")
 		if strings.Contains(tool.Version, installedVersionString) {
