@@ -11,7 +11,7 @@ import (
 
 // sendmsg uses a syscall to broadcast the registry change so that
 // new shells will get the new PATH immediately, without a reboot
-var sendmsg func() // nolint
+var sendmsg func() error // nolint
 
 // NormalizePathEntry will return the given directory path relative
 // from its absolute path to the %USERPROFILE% (home) directory.

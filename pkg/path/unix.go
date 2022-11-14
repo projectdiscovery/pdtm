@@ -13,24 +13,29 @@ import (
 	"github.com/projectdiscovery/gologger"
 )
 
+const confList []*Config{
+	{
+		shellName: "bash",
+		rcFile:    ".bashrc",
+	},
+	{
+		shellName: "zsh",
+		rcFile:    ".zshrc",
+	},
+}
 func add(path string) (bool, error) {
-	shell := filepath.Base(os.Getenv("SHELL"))
-
-	confList := []*Config{
-		{
-			shellName: "bash",
-			rcFile:    ".bashrc",
-		},
-		{
-			shellName: "zsh",
-			rcFile:    ".zshrc",
-		},
+	pathVars := strings.Split(os.Getenv("PATH"), ":")
+	for _, pathVar := range pathVars {
+		if strings.EqualFold(pathVar, defaultPath) {
+			return false, nil
+		}
 	}
 
 	home, err := os.UserHomeDir()
 	if nil != err {
 		return false, err
 	}
+	shell := filepath.Base(os.Getenv("SHELL"))
 	script := fmt.Sprintf("export PATH=%s:$PATH\n\n", path)
 	for _, c := range confList {
 		if c.shellName == shell {
@@ -57,7 +62,7 @@ func add(path string) (bool, error) {
 			if err := f.Close(); err != nil {
 				return false, err
 			}
-			gologger.Info().Msgf("Please run `source ~/%s` or reload terminal to add %s to $PATH ", c.rcFile, path)
+			gologger.Info().Msgf("Please run `source ~/%s` or reload terminal to load new $PATH ", c.rcFile, path)
 		}
 	}
 	return false, fmt.Errorf("shell not supported, please add %s to $PATH manually", path)

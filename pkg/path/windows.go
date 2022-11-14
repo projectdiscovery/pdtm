@@ -59,7 +59,10 @@ func write(cur []string) error {
 		return err
 	}
 	if nil != sendmsg {
-		sendmsg()
+		err := sendmsg()
+		if err != nil {
+			gologger.Info().Label("WRN").Msg("added PATH, but you must reboot for changes to take effect\n")
+		}
 	} else {
 		gologger.Info().Label("WRN").Msg("added PATH, but you must reboot for changes to take effect\n")
 	}
