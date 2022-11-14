@@ -2,7 +2,6 @@ package path
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -37,7 +36,7 @@ func SetENV(path string) error {
 
 	for _, c := range confList {
 		if c.shellName == shell {
-			b, err := ioutil.ReadFile(filepath.Join(home, c.rcFile))
+			b, err := os.ReadFile(filepath.Join(home, c.rcFile))
 			if nil != err {
 				return err
 			}
