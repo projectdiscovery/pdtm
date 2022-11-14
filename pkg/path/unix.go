@@ -63,7 +63,7 @@ func add(path string) (bool, error) {
 			if err := f.Close(); err != nil {
 				return false, err
 			}
-			gologger.Info().Msgf("Please run `source ~/%s` or reload terminal to load new $PATH ", c.rcFile, path)
+			gologger.Info().Msgf("Please run `source ~/%s` or reload terminal to load new $PATH (%s)", c.rcFile, path)
 			return true, nil
 		}
 	}
