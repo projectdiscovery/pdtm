@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"os/exec"
@@ -113,12 +113,12 @@ func UpdateCache(toolList []pkg.Tool) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(cacheFile, b, os.ModePerm)
+	return os.WriteFile(cacheFile, b, os.ModePerm)
 }
 
 // FetchFromCache loads tool list from cache file
 func FetchFromCache() ([]pkg.Tool, error) {
-	b, err := ioutil.ReadFile(cacheFile)
+	b, err := os.ReadFile(cacheFile)
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +180,7 @@ func fetchToolList() ([]pkg.Tool, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
 		}
