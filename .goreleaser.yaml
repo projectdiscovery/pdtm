@@ -24,7 +24,7 @@ builds:
       goarch: 'arm64'
 
   binary: '{{ .ProjectName }}'
-  main: cmd/pdtm/pdtm.go
+  main: cmd/{{ .ProjectName }}/{{ .ProjectName }}.go
 
 archives:
 - format: zip
