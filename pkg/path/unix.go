@@ -13,7 +13,7 @@ import (
 	"github.com/projectdiscovery/gologger"
 )
 
-const confList []*Config{
+var confList = []*Config{
 	{
 		shellName: "bash",
 		rcFile:    ".bashrc",
@@ -23,10 +23,11 @@ const confList []*Config{
 		rcFile:    ".zshrc",
 	},
 }
+
 func add(path string) (bool, error) {
 	pathVars := strings.Split(os.Getenv("PATH"), ":")
 	for _, pathVar := range pathVars {
-		if strings.EqualFold(pathVar, defaultPath) {
+		if strings.EqualFold(pathVar, path) {
 			return false, nil
 		}
 	}
@@ -63,6 +64,7 @@ func add(path string) (bool, error) {
 				return false, err
 			}
 			gologger.Info().Msgf("Please run `source ~/%s` or reload terminal to load new $PATH ", c.rcFile, path)
+			return true, nil
 		}
 	}
 	return false, fmt.Errorf("shell not supported, please add %s to $PATH manually", path)

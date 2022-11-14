@@ -23,12 +23,10 @@ func main() {
 	go func() {
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-		go func() {
-			<-c
-			fmt.Println("\r- Ctrl+C pressed in Terminal, Exiting...")
-			pdtmRunner.Close()
-			os.Exit(0)
-		}()
+		<-c
+		fmt.Println("\r- Ctrl+C pressed in Terminal, Exiting...")
+		pdtmRunner.Close()
+		os.Exit(0)
 	}()
 
 	err = pdtmRunner.Run()
