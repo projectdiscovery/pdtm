@@ -29,7 +29,7 @@ func init() {
 			NewProc("SendMessageW").
 			Call(HWND_BROADCAST, WM_SETTINGCHANGE, 0, uintptr(unsafe.Pointer(utf16PtrENV)))
 		if nil != err {
-			fmt.Fprintf(os.Stderr, "%s\n", err)
+			fmt.Fprintf(os.Stderr, "Adding path: %s\n", err)
 		}
 		return nil
 	}

@@ -36,14 +36,14 @@ func add(p string) (bool, error) {
 	}
 
 	cur = append([]string{p}, cur...)
-	err = write(cur)
+	err = write(p, cur)
 	if nil != err {
 		return false, err
 	}
 	return true, nil
 }
 
-func write(cur []string) error {
+func write(path string, cur []string) error {
 	k, err := registry.OpenKey(registry.CURRENT_USER, `Environment`, registry.SET_VALUE)
 	if err != nil {
 		return fmt.Errorf("Can't open HKCU Environment for writes: %s", err)
@@ -61,11 +61,12 @@ func write(cur []string) error {
 	if nil != sendmsg {
 		err := sendmsg()
 		if err != nil {
-			gologger.Info().Label("WRN").Msg("added PATH, but you must reboot for changes to take effect\n")
+			gologger.Info().Label("WRN").Msgf("Please reboot to load newly added $PATH (%s)", path)
 		}
 	} else {
-		gologger.Info().Label("WRN").Msg("added PATH, but you must reboot for changes to take effect\n")
+		gologger.Info().Label("WRN").Msgf("Please reboot to load newly added $PATH (%s)", path)
 	}
+	gologger.Info().Label("WRN").Msgf("Please reload terminal to load newly added $PATH (%s)", path)
 	return nil
 }
 
