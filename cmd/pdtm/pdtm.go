@@ -11,18 +11,16 @@ import (
 )
 
 func main() {
-
 	options := runner.ParseOptions()
-
 	pdtmRunner, err := runner.NewRunner(options)
 	if err != nil {
 		gologger.Fatal().Msgf("Could not create runner: %s\n", err)
 	}
 
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	// Setup close handler
 	go func() {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 		<-c
 		fmt.Println("\r- Ctrl+C pressed in Terminal, Exiting...")
 		pdtmRunner.Close()
