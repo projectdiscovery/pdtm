@@ -1,11 +1,9 @@
 //go:build !windows
-// +build !windows
 
 package path
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -40,7 +38,7 @@ func add(path string) (bool, error) {
 	script := fmt.Sprintf("export PATH=%s:$PATH\n\n", path)
 	for _, c := range confList {
 		if c.shellName == shell {
-			b, err := ioutil.ReadFile(filepath.Join(home, c.rcFile))
+			b, err := os.ReadFile(filepath.Join(home, c.rcFile))
 			if nil != err {
 				return false, err
 			}
