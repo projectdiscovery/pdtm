@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/projectdiscovery/goflags"
 	"github.com/projectdiscovery/gologger"
@@ -98,12 +97,6 @@ func ParseOptions() *Options {
 	}
 
 	if options.Path == defaultPath {
-		pathVars := strings.Split(os.Getenv("PATH"), ":")
-		for _, pathVar := range pathVars {
-			if strings.EqualFold(pathVar, defaultPath) {
-				return options
-			}
-		}
 		if err := path.SetENV(defaultPath); err != nil {
 			gologger.Fatal().Msgf("Failed to set path: %s. Please add ~/.projectdiscovery to $PATH and run again", err)
 		}

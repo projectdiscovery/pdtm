@@ -9,6 +9,7 @@ require (
 	github.com/projectdiscovery/gologger v1.1.5
 	github.com/projectdiscovery/utils v0.0.3
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a
+	golang.org/x/sys v0.1.0
 )
 
 require (
