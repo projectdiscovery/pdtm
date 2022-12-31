@@ -131,7 +131,7 @@ func FetchFromCache() ([]pkg.Tool, error) {
 
 // ListTools prints the list of tools
 func (r *Runner) ListTools(tools []pkg.Tool) error {
-	fmt.Print("Available ProjectDiscovery FOSS Tools\n\n")
+	gologger.Info().Msgf("Available opensource projects to download\n\n")
 	var i int
 	for _, tool := range tools {
 		i++

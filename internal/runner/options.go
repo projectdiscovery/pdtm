@@ -41,29 +41,28 @@ func ParseOptions() *Options {
 	if err != nil {
 		gologger.Fatal().Msgf("Failed to get user home directory: %s", err)
 	}
-	defaultPath := filepath.Join(home, ".projectdiscovery")
+	defaultPath := filepath.Join(home, ".pdtm/go/bin")
 	options := &Options{}
 	flagSet := goflags.NewFlagSet()
-	flagSet.SetDescription(`projectdiscovery foss tool manager`)
 
 	flagSet.CreateGroup("config", "Config",
-		flagSet.StringVar(&options.ConfigFile, "config", defaultConfigLocation, "flag configuration file"),
-		flagSet.StringVar(&options.Path, "path", defaultPath, "path"),
+		flagSet.StringVar(&options.ConfigFile, "config", defaultConfigLocation, "cli flag configuration file"),
+		flagSet.StringVarP(&options.Path, "binary-path", "bp", defaultPath, "custom location to download project binary"),
 	)
 
 	flagSet.CreateGroup("install", "Install",
-		flagSet.StringSliceVarP(&options.Install, "install", "i", []string{}, "install given pd-tool (comma separated)", goflags.NormalizedStringSliceOptions),
-		flagSet.BoolVarP(&options.InstallAll, "install-all", "ia", false, "install all pd-tools"),
+		flagSet.StringSliceVarP(&options.Install, "install", "i", []string{}, "install single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
+		flagSet.BoolVarP(&options.InstallAll, "install-all", "ia", false, "install all the projects"),
 	)
 
 	flagSet.CreateGroup("update", "Update",
-		flagSet.StringSliceVarP(&options.Update, "update", "u", []string{}, "update given pd-tool (comma separated)", goflags.NormalizedStringSliceOptions),
-		flagSet.BoolVarP(&options.UpdateAll, "update-all", "ua", false, "update all pd-tools"),
+		flagSet.StringSliceVarP(&options.Update, "update", "u", []string{}, "update single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
+		flagSet.BoolVarP(&options.UpdateAll, "update-all", "ua", false, "update all the projects"),
 	)
 
 	flagSet.CreateGroup("remove", "Remove",
-		flagSet.StringSliceVarP(&options.Remove, "remove", "r", []string{}, "remove given pd-tool (comma separated)", goflags.NormalizedStringSliceOptions),
-		flagSet.BoolVarP(&options.RemoveAll, "remove-all", "ra", false, "remove all pd-tools"),
+		flagSet.StringSliceVarP(&options.Remove, "remove", "r", []string{}, "remove single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
+		flagSet.BoolVarP(&options.RemoveAll, "remove-all", "ra", false, "remove all the projects"),
 	)
 
 	flagSet.CreateGroup("debug", "Debug",
@@ -98,7 +97,7 @@ func ParseOptions() *Options {
 
 	if options.Path == defaultPath {
 		if err := path.SetENV(defaultPath); err != nil {
-			gologger.Fatal().Msgf("Failed to set path: %s. Please add ~/.projectdiscovery to $PATH and run again", err)
+			gologger.Fatal().Msgf("Failed to set path: %s. Add ~/.pdtm/go/bin/ to $PATH and run again", err)
 		}
 
 	}
