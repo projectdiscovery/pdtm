@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"os/exec"
@@ -63,6 +63,7 @@ func (r *Runner) Run() error {
 			r.options.Remove = append(r.options.Remove, tool.Name)
 		}
 	}
+	gologger.Verbose().Msgf("using path %s", r.options.Path)
 
 	for _, tool := range r.options.Install {
 		if i, ok := contains(toolList, tool); ok {
@@ -112,12 +113,12 @@ func UpdateCache(toolList []pkg.Tool) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(cacheFile, b, os.ModePerm)
+	return os.WriteFile(cacheFile, b, os.ModePerm)
 }
 
 // FetchFromCache loads tool list from cache file
 func FetchFromCache() ([]pkg.Tool, error) {
-	b, err := ioutil.ReadFile(cacheFile)
+	b, err := os.ReadFile(cacheFile)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +158,7 @@ func installedVersion(i int, tool pkg.Tool) string {
 		}
 	}
 
-	installedVersion := bytes.Split(outb.Bytes(), []byte("Current Version: "))
+	installedVersion := strings.Split(strings.ToLower(outb.String()), "current version: ")
 	if len(installedVersion) == 2 {
 		installedVersionString := strings.TrimPrefix(strings.TrimSpace(string(installedVersion[1])), "v")
 		if strings.Contains(tool.Version, installedVersionString) {
@@ -179,7 +180,7 @@ func fetchToolList() ([]pkg.Tool, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
 		}
