@@ -74,8 +74,9 @@ func (r *Runner) Run() error {
 					gologger.Error().Msgf("error while installing %s: %s", tool, err)
 				}
 			}
+		} else {
+			gologger.Error().Msgf("error while installing %s: %s not found in the list", tool, tool)
 		}
-
 	}
 	for _, tool := range r.options.Update {
 		if i, ok := contains(toolList, tool); ok {
