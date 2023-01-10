@@ -137,7 +137,6 @@ func (r *Runner) ListTools(tools []pkg.Tool) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(dirname)
 	gologger.Info().Msgf(path.GetOsData() + "\n")
 	gologger.Info().Msgf("Default path to download project binary: %s/.pdtm/go/bin\n", dirname)
 	gologger.Info().Msgf("Available opensource projects to download\n\n")
