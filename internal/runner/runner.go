@@ -159,7 +159,7 @@ func installedVersion(i int, tool pkg.Tool) string {
 			if osAvailable {
 				msg = aurora.Red("not installed").String()
 			} else {
-				msg = aurora.Red("not supported").String()
+				msg = aurora.Yellow("not supported").String()
 			}
 		} else {
 			msg = "version not found"
