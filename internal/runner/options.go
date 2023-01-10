@@ -7,6 +7,7 @@ import (
 
 	"github.com/projectdiscovery/goflags"
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/gologger/formatter"
 	"github.com/projectdiscovery/gologger/levels"
 	"github.com/projectdiscovery/pdtm/pkg/path"
 	fileutil "github.com/projectdiscovery/utils/file"
@@ -20,6 +21,7 @@ var cacheFile = filepath.Join(folderutil.HomeDirOrDefault("."), ".config/pdtm/ca
 type Options struct {
 	ConfigFile string
 	Path       string
+	NoColor    bool
 
 	Install goflags.StringSlice
 	Update  goflags.StringSlice
@@ -48,6 +50,7 @@ func ParseOptions() *Options {
 	flagSet.CreateGroup("config", "Config",
 		flagSet.StringVar(&options.ConfigFile, "config", defaultConfigLocation, "cli flag configuration file"),
 		flagSet.StringVarP(&options.Path, "binary-path", "bp", defaultPath, "custom location to download project binary"),
+		flagSet.BoolVarP(&options.NoColor, "no-color", "nc", false, "disable output content coloring (ANSI escape codes)"),
 	)
 
 	flagSet.CreateGroup("install", "Install",
@@ -110,6 +113,9 @@ func (options *Options) configureOutput() {
 	// If the user desires verbose output, show verbose output
 	if options.Verbose {
 		gologger.DefaultLogger.SetMaxLevel(levels.LevelVerbose)
+	}
+	if options.NoColor {
+		gologger.DefaultLogger.SetFormatter(formatter.NewCLI(true))
 	}
 	if options.Silent {
 		gologger.DefaultLogger.SetMaxLevel(levels.LevelSilent)
