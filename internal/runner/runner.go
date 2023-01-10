@@ -11,9 +11,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/logrusorgru/aurora/v3"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/pdtm/pkg"
+	"github.com/projectdiscovery/pdtm/pkg/path"
 )
 
 // Runner contains the internal logic of the program
@@ -74,8 +74,9 @@ func (r *Runner) Run() error {
 					gologger.Error().Msgf("error while installing %s: %s", tool, err)
 				}
 			}
+		} else {
+			gologger.Error().Msgf("error while installing %s: %s not found in the list", tool, tool)
 		}
-
 	}
 	for _, tool := range r.options.Update {
 		if i, ok := contains(toolList, tool); ok {
@@ -131,6 +132,12 @@ func FetchFromCache() ([]pkg.Tool, error) {
 
 // ListTools prints the list of tools
 func (r *Runner) ListTools(tools []pkg.Tool) error {
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	gologger.Info().Msgf(path.GetOsData() + "\n")
+	gologger.Info().Msgf("Default path to download project binary: %s/.pdtm/go/bin\n", dirname)
 	gologger.Info().Msgf("Available opensource projects to download\n\n")
 	var i int
 	for _, tool := range tools {
@@ -152,7 +159,12 @@ func installedVersion(i int, tool pkg.Tool) string {
 	if err != nil {
 		var notFoundError *exec.Error
 		if errors.As(err, &notFoundError) {
-			msg = aurora.Red("not installed").String()
+			osAvailable := isOsAvailable(tool)
+			if osAvailable {
+				msg = au.Red("not installed").String()
+			} else {
+				msg = au.BrightRed("not supported").String()
+			}
 		} else {
 			msg = "version not found"
 		}
@@ -162,9 +174,9 @@ func installedVersion(i int, tool pkg.Tool) string {
 	if len(installedVersion) == 2 {
 		installedVersionString := strings.TrimPrefix(strings.TrimSpace(string(installedVersion[1])), "v")
 		if strings.Contains(tool.Version, installedVersionString) {
-			msg = aurora.Green("installed - latest").String()
+			msg = au.Green("installed - latest").String()
 		} else {
-			msg = aurora.Yellow("installed - outdated").String()
+			msg = au.Yellow("installed - outdated").String()
 		}
 	}
 	fmt.Printf("%d. %s (%s)\n", i, tool.Name, msg)
@@ -204,3 +216,14 @@ func contains(s []pkg.Tool, toolName string) (int, bool) {
 
 // Close the runner instance
 func (r *Runner) Close() {}
+
+func isOsAvailable(tool pkg.Tool) bool {
+	osData := path.CheckOS()
+	for asset := range tool.Assets {
+		expectedAssetPrefix := tool.Name + "_" + tool.Version + "_" + osData
+		if strings.Contains(asset, expectedAssetPrefix) {
+			return true
+		}
+	}
+	return false
+}

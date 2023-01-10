@@ -5,8 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/logrusorgru/aurora/v4"
 	"github.com/projectdiscovery/goflags"
 	"github.com/projectdiscovery/gologger"
+	"github.com/projectdiscovery/gologger/formatter"
 	"github.com/projectdiscovery/gologger/levels"
 	"github.com/projectdiscovery/pdtm/pkg/path"
 	fileutil "github.com/projectdiscovery/utils/file"
@@ -16,10 +18,13 @@ import (
 var defaultConfigLocation = filepath.Join(folderutil.HomeDirOrDefault("."), ".config/pdtm/config.yaml")
 var cacheFile = filepath.Join(folderutil.HomeDirOrDefault("."), ".config/pdtm/cache.json")
 
+var au *aurora.Aurora
+
 // Options contains the configuration options for tuning the enumeration process.
 type Options struct {
 	ConfigFile string
 	Path       string
+	NoColor    bool
 
 	Install goflags.StringSlice
 	Update  goflags.StringSlice
@@ -48,6 +53,7 @@ func ParseOptions() *Options {
 	flagSet.CreateGroup("config", "Config",
 		flagSet.StringVar(&options.ConfigFile, "config", defaultConfigLocation, "cli flag configuration file"),
 		flagSet.StringVarP(&options.Path, "binary-path", "bp", defaultPath, "custom location to download project binary"),
+		flagSet.BoolVarP(&options.NoColor, "no-color", "nc", false, "disable output content coloring (ANSI escape codes)"),
 	)
 
 	flagSet.CreateGroup("install", "Install",
@@ -74,6 +80,9 @@ func ParseOptions() *Options {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
+
+	// configure aurora for logging
+	au = aurora.New(aurora.WithColors(true))
 
 	options.configureOutput()
 
@@ -110,6 +119,10 @@ func (options *Options) configureOutput() {
 	// If the user desires verbose output, show verbose output
 	if options.Verbose {
 		gologger.DefaultLogger.SetMaxLevel(levels.LevelVerbose)
+	}
+	if options.NoColor {
+		gologger.DefaultLogger.SetFormatter(formatter.NewCLI(true))
+		au = aurora.New(aurora.WithColors(false))
 	}
 	if options.Silent {
 		gologger.DefaultLogger.SetMaxLevel(levels.LevelSilent)
