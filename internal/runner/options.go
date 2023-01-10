@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/logrusorgru/aurora/v4"
 	"github.com/projectdiscovery/goflags"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/formatter"
@@ -16,6 +17,8 @@ import (
 
 var defaultConfigLocation = filepath.Join(folderutil.HomeDirOrDefault("."), ".config/pdtm/config.yaml")
 var cacheFile = filepath.Join(folderutil.HomeDirOrDefault("."), ".config/pdtm/cache.json")
+
+var au *aurora.Aurora
 
 // Options contains the configuration options for tuning the enumeration process.
 type Options struct {
@@ -78,6 +81,9 @@ func ParseOptions() *Options {
 		os.Exit(1)
 	}
 
+	// configure aurora for logging
+	au = aurora.New(aurora.WithColors(true))
+
 	options.configureOutput()
 
 	showBanner()
@@ -116,6 +122,7 @@ func (options *Options) configureOutput() {
 	}
 	if options.NoColor {
 		gologger.DefaultLogger.SetFormatter(formatter.NewCLI(true))
+		au = aurora.New(aurora.WithColors(false))
 	}
 	if options.Silent {
 		gologger.DefaultLogger.SetMaxLevel(levels.LevelSilent)

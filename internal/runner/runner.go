@@ -11,7 +11,6 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/logrusorgru/aurora/v3"
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/pdtm/pkg"
 	"github.com/projectdiscovery/pdtm/pkg/path"
@@ -162,9 +161,9 @@ func installedVersion(i int, tool pkg.Tool) string {
 		if errors.As(err, &notFoundError) {
 			osAvailable := isOsAvailable(tool)
 			if osAvailable {
-				msg = aurora.Red("not installed").String()
+				msg = au.Red("not installed").String()
 			} else {
-				msg = aurora.BrightRed("not supported").String()
+				msg = au.BrightRed("not supported").String()
 			}
 		} else {
 			msg = "version not found"
@@ -175,9 +174,9 @@ func installedVersion(i int, tool pkg.Tool) string {
 	if len(installedVersion) == 2 {
 		installedVersionString := strings.TrimPrefix(strings.TrimSpace(string(installedVersion[1])), "v")
 		if strings.Contains(tool.Version, installedVersionString) {
-			msg = aurora.Green("installed - latest").String()
+			msg = au.Green("installed - latest").String()
 		} else {
-			msg = aurora.Yellow("installed - outdated").String()
+			msg = au.Yellow("installed - outdated").String()
 		}
 	}
 	fmt.Printf("%d. %s (%s)\n", i, tool.Name, msg)

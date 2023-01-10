@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/logrusorgru/aurora/v3 v3.0.0
 	github.com/projectdiscovery/goflags v0.1.6
 	github.com/projectdiscovery/gologger v1.1.5
 	github.com/projectdiscovery/utils v0.0.4-0.20221214110533-9f95ee986a54
@@ -23,6 +22,7 @@ require (
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
+	github.com/logrusorgru/aurora/v4 v4.0.0
 	github.com/mholt/archiver v3.1.1+incompatible // indirect
 	github.com/microcosm-cc/bluemonday v1.0.21 // indirect
 	github.com/miekg/dns v1.1.50 // indirect
