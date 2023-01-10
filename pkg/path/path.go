@@ -2,6 +2,7 @@ package path
 
 import (
 	"runtime"
+	"strings"
 )
 
 type Config struct {
@@ -28,6 +29,13 @@ func CheckOS() string {
 	case "linux":
 		return "linux_" + arc
 	default:
-		return ""
+		return "not_found"
 	}
+}
+
+func GetOsData() string {
+	os := runtime.GOOS
+	arc := runtime.GOARCH
+	goVersion := runtime.Version()
+	return "[OS: " + strings.ToUpper(os) + "] [ARCH: " + strings.ToUpper(arc) + "] [GO: " + goVersion + "]"
 }

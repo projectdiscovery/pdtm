@@ -134,7 +134,8 @@ func FetchFromCache() ([]pkg.Tool, error) {
 // ListTools prints the list of tools
 func (r *Runner) ListTools(tools []pkg.Tool) error {
 	gologger.Info().Msgf("Available opensource projects to download\n")
-	gologger.Info().Msgf("OS: %s\n\n", path.CheckOS())
+	gologger.Info().Msgf(path.GetOsData() + "\n")
+	gologger.Info().Msgf("Default path to download project binary: $HOME/.pdtm/go/bin\n\n")
 	var i int
 	for _, tool := range tools {
 		i++
@@ -159,7 +160,7 @@ func installedVersion(i int, tool pkg.Tool) string {
 			if osAvailable {
 				msg = aurora.Red("not installed").String()
 			} else {
-				msg = aurora.Yellow("not supported").String()
+				msg = aurora.BrightRed("not supported").String()
 			}
 		} else {
 			msg = "version not found"
