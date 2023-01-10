@@ -36,6 +36,6 @@ func CheckOS() string {
 func GetOsData() string {
 	os := runtime.GOOS
 	arc := runtime.GOARCH
-	goVersion := runtime.Version()
+	goVersion := strings.ReplaceAll(runtime.Version(), "go", "")
 	return "[OS: " + strings.ToUpper(os) + "] [ARCH: " + strings.ToUpper(arc) + "] [GO: " + goVersion + "]"
 }

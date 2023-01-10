@@ -133,8 +133,13 @@ func FetchFromCache() ([]pkg.Tool, error) {
 
 // ListTools prints the list of tools
 func (r *Runner) ListTools(tools []pkg.Tool) error {
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	fmt.Println(dirname)
 	gologger.Info().Msgf(path.GetOsData() + "\n")
-	gologger.Info().Msgf("Default path to download project binary: $HOME/.pdtm/go/bin\n")
+	gologger.Info().Msgf("Default path to download project binary: %s/.pdtm/go/bin\n", dirname)
 	gologger.Info().Msgf("Available opensource projects to download\n\n")
 	var i int
 	for _, tool := range tools {
