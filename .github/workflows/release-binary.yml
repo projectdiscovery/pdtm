@@ -1,6 +1,7 @@
 name: 🎉 Release Binary
+
 on:
-  create:
+  push:
     tags:
       - v*
   workflow_dispatch:
@@ -17,7 +18,9 @@ jobs:
       - name: "Set up Go"
         uses: actions/setup-go@v3
         with: 
-          go-version: 1.18
+          go-version: 1.19
+          check-latest: true
+          cache: true
       
       - name: "Create release on GitHub"
         uses: goreleaser/goreleaser-action@v4
