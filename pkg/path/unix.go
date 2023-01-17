@@ -46,7 +46,7 @@ func add(path string) (bool, error) {
 			lines := strings.Split(strings.TrimSpace(string(b)), "\n")
 			for _, line := range lines {
 				if strings.EqualFold(line, strings.TrimSpace(script)) {
-					gologger.Info().Msgf("Please run `source ~/%s` or reload terminal to add %s to $PATH ", c.rcFile, path)
+					gologger.Info().Msgf("Run `source ~/%s` to add %s to $PATH ", c.rcFile, path)
 					return true, nil
 				}
 			}
@@ -61,9 +61,9 @@ func add(path string) (bool, error) {
 			if err := f.Close(); err != nil {
 				return false, err
 			}
-			gologger.Info().Label("WRN").Msgf("Please run `source ~/%s` or reload terminal to load newly added $PATH (%s)", c.rcFile, path)
+			gologger.Info().Label("WRN").Msgf("Run `source ~/%s` to add $PATH (%s)", c.rcFile, path)
 			return true, nil
 		}
 	}
-	return false, fmt.Errorf("shell not supported, please add %s to $PATH manually", path)
+	return false, fmt.Errorf("shell not supported, add %s to $PATH env", path)
 }
