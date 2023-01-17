@@ -19,21 +19,38 @@
   <a href="#usage">Usage</a> •
   <a href="#running-pdtm">Running pdtm</a> •
   <a href="https://discord.gg/projectdiscovery">Join Discord</a>
+
+**pdtm** is a simple and easy-to-use golang based tool for managing open source projects from ProjectDiscovery.
+
 </p>
 
-
-**pdtm** is a simple and easy-to-use go tool for managing open source projects from ProjectDiscovery.
-
+<h1 align="center">
+<img src="https://user-images.githubusercontent.com/8293321/212781914-bae85495-5a7b-40d7-9e05-964a8edf3b61.png" width="700px">
+</h1>
 
 ## Installation
 
 
-**`pdtm`** requires **go1.19** to install successfully. Run the following command to install the latest version: 
+**`pdtm`** requires **go1.19** to install successfully. Run the following command to install the latest version:
+
+1. Install using go install -
 
 ```sh
 go install -v github.com/projectdiscovery/pdtm/cmd/pdtm@latest
 ```
 
+2. Install by downloading binary from https://github.com/projectdiscovery/pdtm/releases
+
+<table>
+<tr>
+<td>  
+
+> **Note**:
+> *Currently, projects are installed by downloading the released project binary. This means that projects can only be installed on the platforms for which binaries have been published.*
+
+</table>
+</tr>
+</td> 
 
 ## Usage: 
 
@@ -68,19 +85,29 @@ DEBUG:
 ## Running pdtm
 
 ```console
+$ pdtm -install-all
+                ____          
+     ____  ____/ / /_____ ___ 
+    / __ \/ __  / __/ __ __  \
+   / /_/ / /_/ / /_/ / / / / /
+  / .___/\__,_/\__/_/ /_/ /_/ 
+ /_/                          v0.0.1
 
-$ pdtm -i httpx,nuclei -u naabu,dnsx
-                __ __           
-    ____   ____/ // /_ ____ ___ 
-   / __ \ / __  // __// __  __ \
-  / /_/ // /_/ // /_ / / / / / /
- / .___/ \__,_/ \__//_/ /_/ /_/ 
-/_/                      v0.0.1
-
-		projectdiscovery.io
+      projectdiscovery.io
 
 [INF] Installed httpx v1.1.1
 [INF] Installed nuclei v2.6.3
-[INF] Updated to naabu v2.6.3
-[INF] Updated to dnsx v2.6.3
-```
+[INF] Installed naabu v2.6.3
+[INF] Installed dnsx v2.6.3
+``` 
+
+--------
+
+<div align="center">
+
+**pdtm** is made with ❤️ by the [projectdiscovery](https://projectdiscovery.io) team and distributed under [MIT License](LICENSE).
+
+
+<a href="https://discord.gg/projectdiscovery"><img src="https://raw.githubusercontent.com/projectdiscovery/nuclei-burp-plugin/main/static/join-discord.png" width="300" alt="Join Discord"></a>
+
+</div>
