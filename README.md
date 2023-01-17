@@ -28,7 +28,7 @@
 ## Installation
 
 
-***`pdtm`** requires **go1.19** to install successfully. Run the following command to install the latest version: 
+**`pdtm`** requires **go1.19** to install successfully. Run the following command to install the latest version: 
 
 ```sh
 go install -v github.com/projectdiscovery/pdtm/cmd/pdtm@latest
