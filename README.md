@@ -17,22 +17,23 @@
   <a href="#features">Features</a> •
   <a href="#installation">Installation</a> •
   <a href="#usage">Usage</a> •
-  <a href="#running-tlsx">Running tlsx</a> •
+  <a href="#running-pdtm">Running pdtm</a> •
   <a href="https://discord.gg/projectdiscovery">Join Discord</a>
 </p>
 
 
-A simple project that enables users to list, install, update, and remove the projectdiscovery tools.
+**pdtm** is a simple and easy-to-use go tool for managing open source projects from ProjectDiscovery.
 
-## Features:
 
-* List all the available pd tools (default)
-* Install given pd tool
-* Install all the available pd tools
-* Remove given pd tool
-* Remove all the pd tool
-* Update given pd tool
-* Update all the pd tools
+## Installation
+
+
+***`pdtm`** requires **go1.19** to install successfully. Run the following command to install the latest version: 
+
+```sh
+go install -v github.com/projectdiscovery/pdtm/cmd/pdtm@latest
+```
+
 
 ## Usage: 
 
@@ -45,7 +46,6 @@ Flags:
 CONFIG:
    -config string            cli flag configuration file (default "$HOME/.config/pdtm/config.yaml")
    -bp, -binary-path string  custom location to download project binary (default "$HOME/.pdtm/go/bin")
-   -nc, -no-color            disable output content coloring (ANSI escape codes)
 
 INSTALL:
    -i, -install string[]  install single or multiple project by name (comma separated)
@@ -60,6 +60,7 @@ REMOVE:
    -ra, -remove-all      remove all the projects
 
 DEBUG:
+   -nc, -no-color            disable output content coloring (ANSI escape codes)
    -version  show version of the project
    -v        show verbose output
 ```
@@ -82,5 +83,4 @@ $ pdtm -i httpx,nuclei -u naabu,dnsx
 [INF] Installed nuclei v2.6.3
 [INF] Updated to naabu v2.6.3
 [INF] Updated to dnsx v2.6.3
-
 ```
