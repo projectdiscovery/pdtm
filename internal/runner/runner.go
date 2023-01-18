@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"runtime"
 	"fmt"
 	"io"
 	"net/http"
@@ -182,9 +183,20 @@ func installedVersion(i int, tool pkg.Tool) string {
 	return msg
 }
 
+const host = "https://api.pdtm.sh"
+
 func fetchToolList() ([]pkg.Tool, error) {
 	tools := make([]pkg.Tool, 0)
-	resp, err := http.Get("https://api.pdtm.sh/api/v1/tools")
+
+	// Get current OS name, architecture, and Go version
+	osName := runtime.GOOS
+	osArch := runtime.GOARCH
+	goVersion := runtime.Version()
+
+	// Create the request URL with query parameters
+	reqURL := host + "/api/v1/tools?os=" + osName + "&arch=" + osArch + "&go_version=" + goVersion
+
+	resp, err := http.Get(reqURL)
 	if err != nil {
 		return nil, err
 	}
