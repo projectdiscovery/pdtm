@@ -174,9 +174,9 @@ func installedVersion(i int, tool pkg.Tool) string {
 	if len(installedVersion) == 2 {
 		installedVersionString := strings.TrimPrefix(strings.TrimSpace(string(installedVersion[1])), "v")
 		if strings.Contains(tool.Version, installedVersionString) {
-			msg = au.Green("installed - latest").String()
+			msg = au.Green("installed - (" + tool.Version + ") latest").String()
 		} else {
-			msg = au.Yellow("installed - outdated").String()
+			msg = au.Yellow("installed - (" + tool.Version + ") outdated").String()
 		}
 	}
 	fmt.Printf("%d. %s (%s)\n", i, tool.Name, msg)
