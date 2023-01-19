@@ -6,7 +6,7 @@ import (
 	"github.com/projectdiscovery/gologger"
 )
 
-const Version = "v0.0.1"
+const Version = "v0.0.2"
 
 var banner = fmt.Sprintf(`
                 ____          

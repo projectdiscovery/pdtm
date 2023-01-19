@@ -54,7 +54,7 @@ func add(path string) (bool, error) {
 			if err != nil {
 				return false, err
 			}
-			script := fmt.Sprintf("# Generated for pdtm. Do not edit.\n%s", script)
+			script := fmt.Sprintf("\n\n# Generated for pdtm. Do not edit.\n%s", script)
 			if _, err := f.Write([]byte(script)); err != nil {
 				return false, err
 			}
