@@ -161,9 +161,9 @@ func installedVersion(i int, tool pkg.Tool) string {
 		if errors.As(err, &notFoundError) {
 			osAvailable := isOsAvailable(tool)
 			if osAvailable {
-				msg = au.Red("not installed").String()
+				msg = au.BrightYellow("(not installed)").String()
 			} else {
-				msg = au.BrightRed("not supported").String()
+				msg = au.Gray(10, "(not supported)").String()
 			}
 		} else {
 			msg = "version not found"
@@ -174,12 +174,12 @@ func installedVersion(i int, tool pkg.Tool) string {
 	if len(installedVersion) == 2 {
 		installedVersionString := strings.TrimPrefix(strings.TrimSpace(string(installedVersion[1])), "v")
 		if strings.Contains(tool.Version, installedVersionString) {
-			msg = au.Green("installed - latest").String()
+			msg = au.Green("(latest) (" + tool.Version + ")").String()
 		} else {
-			msg = au.Yellow("installed - outdated").String()
+			msg = au.Red("(outdated) ("+installedVersionString+")").String() + " ➡ " + au.Green("("+tool.Version+")").String()
 		}
 	}
-	fmt.Printf("%d. %s (%s)\n", i, tool.Name, msg)
+	fmt.Printf("%d. %s %s\n", i, tool.Name, msg)
 	return msg
 }
 
