@@ -20,6 +20,10 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Install all the tools
+      - name: Dry Run - No Tool Installed
+        run: go run .
+        working-directory: cmd/pdtm/
+
+      - name: Install Run - Setup All The Tools
         run: go run .
         working-directory: cmd/pdtm/
