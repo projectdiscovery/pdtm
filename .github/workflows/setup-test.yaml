@@ -1,4 +1,4 @@
-name: 🔨 Build Test
+name: 🔨 Setup Test
 
 on:
   pull_request:
