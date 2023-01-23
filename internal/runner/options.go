@@ -25,6 +25,7 @@ type Options struct {
 	ConfigFile string
 	Path       string
 	NoColor    bool
+	NoSetPath  bool
 
 	Install goflags.StringSlice
 	Update  goflags.StringSlice
@@ -53,6 +54,7 @@ func ParseOptions() *Options {
 	flagSet.CreateGroup("config", "Config",
 		flagSet.StringVar(&options.ConfigFile, "config", defaultConfigLocation, "cli flag configuration file"),
 		flagSet.StringVarP(&options.Path, "binary-path", "bp", defaultPath, "custom location to download project binary"),
+		flagSet.BoolVarP(&options.NoSetPath, "no-set-path", "nsp", false, "don't add path to environment variables"),
 	)
 
 	flagSet.CreateGroup("install", "Install",
@@ -104,9 +106,9 @@ func ParseOptions() *Options {
 		gologger.Fatal().Msgf("pdtm error: %s\n", err)
 	}
 
-	if options.Path == defaultPath {
+	if options.Path == defaultPath && !options.NoSetPath {
 		if err := path.SetENV(defaultPath); err != nil {
-			gologger.Fatal().Msgf("Failed to set path: %s. Add ~/.pdtm/go/bin/ to $PATH and run again", err)
+			gologger.Warning().Msgf("Failed to set path: %s. Add ~/.pdtm/go/bin/ to $PATH and run again", err)
 		}
 
 	}
