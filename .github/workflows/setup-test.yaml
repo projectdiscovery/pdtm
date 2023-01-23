@@ -31,3 +31,7 @@ jobs:
       - name: Update Run - Update All The Tools
         run: go run . -ua
         working-directory: cmd/pdtm/
+      
+      - name: Remove Run - Remove All The Tools
+        run: go run . -ra
+        working-directory: cmd/pdtm/
