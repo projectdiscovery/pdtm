@@ -1,0 +1,25 @@
+name: 🔨 Build Test
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Test Setups
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Install all the tools
+        run: go run .
+        working-directory: cmd/pdtm/

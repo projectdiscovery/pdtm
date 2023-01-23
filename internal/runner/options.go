@@ -56,17 +56,17 @@ func ParseOptions() *Options {
 	)
 
 	flagSet.CreateGroup("install", "Install",
-		flagSet.StringSliceVarP(&options.Install, "install", "i", []string{}, "install single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Install, "install", "i", nil, "install single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.BoolVarP(&options.InstallAll, "install-all", "ia", false, "install all the projects"),
 	)
 
 	flagSet.CreateGroup("update", "Update",
-		flagSet.StringSliceVarP(&options.Update, "update", "u", []string{}, "update single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Update, "update", "u", nil, "update single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.BoolVarP(&options.UpdateAll, "update-all", "ua", false, "update all the projects"),
 	)
 
 	flagSet.CreateGroup("remove", "Remove",
-		flagSet.StringSliceVarP(&options.Remove, "remove", "r", []string{}, "remove single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Remove, "remove", "r", nil, "remove single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.BoolVarP(&options.RemoveAll, "remove-all", "ra", false, "remove all the projects"),
 	)
 
