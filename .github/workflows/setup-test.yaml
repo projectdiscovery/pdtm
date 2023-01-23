@@ -25,5 +25,9 @@ jobs:
         working-directory: cmd/pdtm/
 
       - name: Install Run - Setup All The Tools
-        run: go run .
+        run: go run . -ia
+        working-directory: cmd/pdtm/
+
+      - name: Update Run - Update All The Tools
+        run: go run . -ua
         working-directory: cmd/pdtm/
