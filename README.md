@@ -63,6 +63,7 @@ Flags:
 CONFIG:
    -config string            cli flag configuration file (default "$HOME/.config/pdtm/config.yaml")
    -bp, -binary-path string  custom location to download project binary (default "$HOME/.pdtm/go/bin")
+   -nsp, -no-set-path        don't add path to environment variables
 
 INSTALL:
    -i, -install string[]  install single or multiple project by name (comma separated)
@@ -77,9 +78,10 @@ REMOVE:
    -ra, -remove-all      remove all the projects
 
 DEBUG:
-   -nc, -no-color            disable output content coloring (ANSI escape codes)
-   -version  show version of the project
-   -v        show verbose output
+   -show-path      prints the current binaries path then exit
+   -version        show version of the project
+   -v              show verbose output
+   -nc, -no-color  disable output content coloring (ANSI escape codes)
 ```
 
 ## Running pdtm
