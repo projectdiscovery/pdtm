@@ -31,6 +31,10 @@ jobs:
         run: go run . -ia
         working-directory: cmd/pdtm/
 
+      - name: Add binaries folder to ENV PATH
+        run: go run . -show-path -nsp >> $GITHUB_PATH
+        working-directory: cmd/pdtm/
+
       - name: Checking tools existence
         run: |
           go run . | grep -vz "not installed"
