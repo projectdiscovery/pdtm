@@ -31,7 +31,7 @@ jobs:
       - name: Checking tools existence
         # inverted match with grep
         run: |
-          go run . | grep -n "not installed"
+          go run . | grep -vz "not installed"
         working-directory: cmd/pdtm/
 
       - name: Update Run - Update All The Tools
