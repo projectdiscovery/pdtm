@@ -28,6 +28,12 @@ jobs:
         run: go run . -ia
         working-directory: cmd/pdtm/
 
+      - name: Checking tools existence
+        # inverted match with grep
+        run: |
+          go run . | grep -n "not installed"
+        working-directory: cmd/pdtm/
+
       - name: Update Run - Update All The Tools
         run: go run . -ua
         working-directory: cmd/pdtm/
