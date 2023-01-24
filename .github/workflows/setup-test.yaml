@@ -32,7 +32,6 @@ jobs:
         working-directory: cmd/pdtm/
 
       - name: Checking tools existence
-        # inverted match with grep
         run: |
           go run . | grep -vz "not installed"
         working-directory: cmd/pdtm/
