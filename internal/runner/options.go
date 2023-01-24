@@ -35,9 +35,10 @@ type Options struct {
 	UpdateAll  bool
 	RemoveAll  bool
 
-	Verbose bool
-	Silent  bool
-	Version bool
+	Verbose  bool
+	Silent   bool
+	Version  bool
+	ShowPath bool
 }
 
 // ParseOptions parses the command line flags provided by a user
@@ -73,6 +74,7 @@ func ParseOptions() *Options {
 	)
 
 	flagSet.CreateGroup("debug", "Debug",
+		flagSet.BoolVar(&options.ShowPath, "show-path", false, "prints the current binaries path then exit"),
 		flagSet.BoolVar(&options.Version, "version", false, "show version of the project"),
 		flagSet.BoolVar(&options.Verbose, "v", false, "show verbose output"),
 		flagSet.BoolVarP(&options.NoColor, "no-color", "nc", false, "disable output content coloring (ANSI escape codes)"),
@@ -92,6 +94,12 @@ func ParseOptions() *Options {
 
 	if options.Version {
 		gologger.Info().Msgf("Current Version: %s\n", Version)
+		os.Exit(0)
+	}
+
+	if options.ShowPath {
+		// prints default path if not modified
+		gologger.Silent().Msg(options.Path)
 		os.Exit(0)
 	}
 
