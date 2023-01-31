@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -20,6 +21,5 @@ func Remove(path string, tool Tool) error {
 		gologger.Info().Msgf("removed %s", tool.Name)
 		return nil
 	}
-	gologger.Info().Msgf("tool %s not found in path %s: skipping removal", tool.Name, executablePath)
-	return nil
+	return fmt.Errorf(ErrToolNotFound, tool.Name, executablePath)
 }
