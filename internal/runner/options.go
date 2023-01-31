@@ -50,6 +50,11 @@ func ParseOptions() *Options {
 	options := &Options{}
 	flagSet := goflags.NewFlagSet()
 
+	flagSet.SetDescription(`Pdtm is a golang-based tool designed to simplify the management of open source projects. 
+It offers a straightforward way to install, update, and remove tools.
+
+By ProjectDiscovery`)
+
 	flagSet.CreateGroup("config", "Config",
 		flagSet.StringVar(&options.ConfigFile, "config", defaultConfigLocation, "cli flag configuration file"),
 		flagSet.StringVarP(&options.Path, "binary-path", "bp", defaultPath, "custom location to download project binary"),
