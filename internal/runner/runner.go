@@ -92,7 +92,7 @@ func (r *Runner) Run() error {
 	}
 	for _, tool := range r.options.Remove {
 		if i, ok := contains(toolList, tool); ok {
-			if err := pkg.Remove(toolList[i], r.options.Path); err != nil {
+			if err := pkg.Remove(r.options.Path, toolList[i]); err != nil {
 				var notFoundError *exec.Error
 				if errors.As(err, &notFoundError) {
 					gologger.Info().Msgf("%s: not found", tool)
