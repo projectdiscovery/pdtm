@@ -17,9 +17,8 @@ func Update(tool Tool, path string) error {
 		var notFoundError *exec.Error
 		if errors.As(err, &notFoundError) {
 			gologger.Info().Msgf("%s: not found", tool.Name)
-			return Install(tool, path)
+			return nil
 		}
-		return err
 	}
 	if isUpToDate(tool) {
 		return ErrIsUpToDate
