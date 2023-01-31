@@ -12,7 +12,7 @@ import (
 )
 
 // Update updates a given tool
-func Update(tool Tool, path string) error {
+func Update(path string, tool Tool) error {
 	executablePath := filepath.Join(path, tool.Name)
 	if fileutil.FileExists(executablePath) {
 		if isUpToDate(tool) {
@@ -30,7 +30,7 @@ func Update(tool Tool, path string) error {
 		return nil
 	} else {
 		gologger.Info().Msgf("%s: not found in path %s", tool.Name, executablePath)
-		return Install(tool, path)
+		return Install(path, tool)
 	}
 }
 
