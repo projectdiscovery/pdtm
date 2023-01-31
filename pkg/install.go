@@ -10,20 +10,22 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
 
 	"github.com/projectdiscovery/gologger"
+	fileutil "github.com/projectdiscovery/utils/file"
 )
 
 var extIfFound = ".exe"
 
 // Install installs given tool at path
 func Install(tool Tool, path string) error {
-	if path, _ := exec.LookPath(tool.Name); path != "" {
+	executablePath := filepath.Join(path, tool.Name)
+	if fileutil.FileExists(executablePath) {
+		gologger.Info().Msgf("%s is already present in path %s: skipping installation", tool.Name, executablePath)
 		return ErrIsInstalled
 	}
 	gologger.Info().Msgf("installing %s...", tool.Name)

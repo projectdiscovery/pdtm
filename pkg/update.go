@@ -2,38 +2,36 @@ package pkg
 
 import (
 	"bytes"
-	"errors"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/projectdiscovery/gologger"
+	fileutil "github.com/projectdiscovery/utils/file"
 )
 
 // Update updates a given tool
 func Update(tool Tool, path string) error {
-	executablePath, err := exec.LookPath(tool.Name)
-	if err != nil {
-		var notFoundError *exec.Error
-		if errors.As(err, &notFoundError) {
-			gologger.Info().Msgf("%s: not found", tool.Name)
-			return Install(tool, path)
+	executablePath := filepath.Join(path, tool.Name)
+	if fileutil.FileExists(executablePath) {
+		if isUpToDate(tool) {
+			return ErrIsUpToDate
 		}
-		return err
+		gologger.Info().Msgf("updating %s...", tool.Name)
+		if err := os.Remove(executablePath); err != nil {
+			return err
+		}
+		version, err := install(tool, path)
+		if err != nil {
+			return err
+		}
+		gologger.Info().Msgf("updated %s to %s(latest)", tool.Name, version)
+		return nil
+	} else {
+		gologger.Info().Msgf("%s: not found in path %s", tool.Name, executablePath)
+		return Install(tool, path)
 	}
-	if isUpToDate(tool) {
-		return ErrIsUpToDate
-	}
-	gologger.Info().Msgf("updating %s...", tool.Name)
-	if err := os.Remove(executablePath); err != nil {
-		return err
-	}
-	version, err := install(tool, path)
-	if err != nil {
-		return err
-	}
-	gologger.Info().Msgf("updated %s to %s(latest)", tool.Name, version)
-	return nil
 }
 
 func isUpToDate(tool Tool) (latest bool) {
