@@ -1,6 +1,8 @@
 package pkg
 
-import "errors"
+import (
+	"errors"
+)
 
 const Organization = "projectdiscovery"
 
