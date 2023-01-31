@@ -55,7 +55,7 @@ func ParseOptions() *Options {
 	flagSet.CreateGroup("config", "Config",
 		flagSet.StringVar(&options.ConfigFile, "config", defaultConfigLocation, "cli flag configuration file"),
 		flagSet.StringVarP(&options.Path, "binary-path", "bp", defaultPath, "custom location to download project binary"),
-		flagSet.BoolVarP(&options.NoSetPath, "no-set-path", "nsp", false, "don't add path to environment variables"),
+		flagSet.BoolVarP(&options.NoSetPath, "no-set-path", "nsp", false, "disable adding path to environment variables"),
 	)
 
 	flagSet.CreateGroup("install", "Install",
@@ -74,9 +74,9 @@ func ParseOptions() *Options {
 	)
 
 	flagSet.CreateGroup("debug", "Debug",
-		flagSet.BoolVar(&options.ShowPath, "show-path", false, "prints the current binaries path then exit"),
+		flagSet.BoolVarP(&options.ShowPath, "show-path", "sp", false, "show the current binary path then exit"),
 		flagSet.BoolVar(&options.Version, "version", false, "show version of the project"),
-		flagSet.BoolVar(&options.Verbose, "v", false, "show verbose output"),
+		flagSet.BoolVarP(&options.Verbose, "verbose", "v", false, "show verbose output"),
 		flagSet.BoolVarP(&options.NoColor, "no-color", "nc", false, "disable output content coloring (ANSI escape codes)"),
 	)
 
