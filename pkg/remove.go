@@ -12,7 +12,7 @@ import (
 // Remove removes given tool
 func Remove(path string, tool Tool) error {
 	executablePath := filepath.Join(path, tool.Name)
-	if fileutil.FileExists(executablePath) {
+	if fileutil.FileExists(executablePath) || fileutil.FileExists(executablePath+".exe") {
 		gologger.Info().Msgf("removing %s...", tool.Name)
 		err := os.Remove(executablePath)
 		if err != nil {
