@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	fileutils "github.com/projectdiscovery/utils/file"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,7 +36,7 @@ func TestInstallTool(t *testing.T) {
 	tool := GetToolStruct()
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
-	assert.Nil(t, err, err)
+	assert.Nil(t, err)
 	defer os.RemoveAll(pathBin)
 
 	// create directory
@@ -43,12 +45,12 @@ func TestInstallTool(t *testing.T) {
 
 	// install first time
 	err = Install(pathBin, tool)
-	assert.Nil(t, err, err)
+	assert.Nil(t, err)
 
 	// check if its installed in path
 	// need to throw exeption
 	err = Install(pathBin, tool)
-	assert.NotNil(t, err, err)
+	assert.NotNil(t, err)
 }
 
 func TestRemoveTool(t *testing.T) {
@@ -112,6 +114,6 @@ func TestUpdateToolDufferentVersion(t *testing.T) {
 	assert.Nil(t, err)
 
 	// check if tool is installed post update
-	_, err = os.Stat(filepath.Join(pathBin, tool.Name))
-	assert.Nil(t, err, err)
+	fileExist := fileutils.FileExists(filepath.Join(pathBin, tool.Name))
+	assert.True(t, fileExist)
 }
