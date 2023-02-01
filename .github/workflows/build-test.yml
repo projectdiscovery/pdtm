@@ -33,7 +33,8 @@ jobs:
         working-directory: cmd/pdtm/
 
       - name: Check Remove Function
-      - run: |
-        cp binary/dnsx /usr/bin/dnsx
-        pdtm -remove dnsx
-        ls /usr/bin/dnsx
+        run: cp binary/dnsx /usr/bin/dnsx
+        run: pdtm -remove dnsx
+        run: ls /usr/bin/dnsx
+        
+        working-directory: .
