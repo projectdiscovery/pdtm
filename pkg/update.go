@@ -7,16 +7,15 @@ import (
 	"path/filepath"
 	"strings"
 
+	ospath "github.com/projectdiscovery/pdtm/pkg/path"
+
 	"github.com/projectdiscovery/gologger"
 	fileutil "github.com/projectdiscovery/utils/file"
 )
 
 // Update updates a given tool
 func Update(path string, tool Tool) error {
-	executablePath := filepath.Join(path, tool.Name)
-	if fileutil.FileExists(executablePath + ".exe") {
-		executablePath = executablePath + ".exe"
-	}
+	executablePath := ospath.GetExecutablePath(path, tool.Name)
 	if fileutil.FileExists(executablePath) {
 		if isUpToDate(tool, path) {
 			return ErrIsUpToDate

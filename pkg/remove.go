@@ -3,7 +3,8 @@ package pkg
 import (
 	"fmt"
 	"os"
-	"path/filepath"
+
+	ospath "github.com/projectdiscovery/pdtm/pkg/path"
 
 	"github.com/projectdiscovery/gologger"
 	fileutil "github.com/projectdiscovery/utils/file"
@@ -11,10 +12,7 @@ import (
 
 // Remove removes given tool
 func Remove(path string, tool Tool) error {
-	executablePath := filepath.Join(path, tool.Name)
-	if fileutil.FileExists(executablePath + ".exe") {
-		executablePath = executablePath + ".exe"
-	}
+	executablePath := ospath.GetExecutablePath(path, tool.Name)
 	if fileutil.FileExists(executablePath) {
 		gologger.Info().Msgf("removing %s...", tool.Name)
 		err := os.Remove(executablePath)

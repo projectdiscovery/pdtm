@@ -1,8 +1,11 @@
 package path
 
 import (
+	"path/filepath"
 	"runtime"
 	"strings"
+
+	fileutil "github.com/projectdiscovery/utils/file"
 )
 
 type Config struct {
@@ -35,4 +38,12 @@ func GetOsData() string {
 	arc := runtime.GOARCH
 	goVersion := strings.ReplaceAll(runtime.Version(), "go", "")
 	return "[OS: " + strings.ToUpper(os) + "] [ARCH: " + strings.ToUpper(arc) + "] [GO: " + goVersion + "]"
+}
+
+func GetExecutablePath(path, toolName string) string {
+	executablePath := filepath.Join(path, toolName)
+	if fileutil.FileExists(executablePath + ".exe") {
+		executablePath = executablePath + ".exe"
+	}
+	return executablePath
 }
