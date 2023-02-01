@@ -31,3 +31,9 @@ jobs:
       - name: Race Condition Tests
         run: go build -race .
         working-directory: cmd/pdtm/
+
+      - name: Check Remove Function
+      - run: |
+        cp binary/dnsx /usr/bin/dnsx
+        pdtm -remove dnsx
+        ls /usr/bin/dnsx
