@@ -110,6 +110,6 @@ func TestUpdateToolDufferentVersion(t *testing.T) {
 	assert.Nil(t, err)
 
 	// check if tool is installed post update
-	fileExist := fileutils.FileExists(filepath.Join(pathBin, tool.Name))
+	fileExist := fileutils.FileExists(filepath.Join(pathBin, tool.Name)) || fileutils.FileExists(filepath.Join(pathBin, tool.Name+".exe"))
 	assert.True(t, fileExist)
 }

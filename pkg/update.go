@@ -14,7 +14,10 @@ import (
 // Update updates a given tool
 func Update(path string, tool Tool) error {
 	executablePath := filepath.Join(path, tool.Name)
-	if fileutil.FileExists(executablePath) || fileutil.FileExists(executablePath+".exe") {
+	if fileutil.FileExists(executablePath + ".exe") {
+		executablePath = executablePath + ".exe"
+	}
+	if fileutil.FileExists(executablePath) {
 		if isUpToDate(tool, path) {
 			return ErrIsUpToDate
 		}
