@@ -35,7 +35,7 @@ func add(p string) (bool, error) {
 		return false, nil
 	}
 
-	cur = append([]string{p}, cur...)
+	cur = append(cur, p)
 	err = write(p, cur)
 	if nil != err {
 		return false, err
