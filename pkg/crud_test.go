@@ -2,9 +2,8 @@ package pkg
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -34,24 +33,28 @@ func GetToolStruct() Tool {
 func TestInstallTool(t *testing.T) {
 	tool := GetToolStruct()
 
-	pathBin, err := ioutil.TempDir("", "test-dir")
-	assert.Nil(t, err)
+	pathBin, err := os.MkdirTemp("", "test-dir")
+	assert.Nil(t, err, err)
 	defer os.RemoveAll(pathBin)
+
+	// create directory
+	err = os.MkdirAll(pathBin, 0777)
+	assert.Nil(t, err)
 
 	// install first time
 	err = Install(pathBin, tool)
-	assert.Nil(t, err)
+	assert.Nil(t, err, err)
 
 	// check if its installed in path
 	// need to throw exeption
 	err = Install(pathBin, tool)
-	assert.NotNil(t, err)
+	assert.NotNil(t, err, err)
 }
 
 func TestRemoveTool(t *testing.T) {
 	tool := GetToolStruct()
 
-	pathBin, err := ioutil.TempDir("", "test-dir")
+	pathBin, err := os.MkdirTemp("", "test-dir")
 	assert.Nil(t, err)
 	defer os.RemoveAll(pathBin)
 
@@ -65,5 +68,50 @@ func TestRemoveTool(t *testing.T) {
 
 	// throws error
 	err = Remove(pathBin, tool)
-	assert.Equal(t, err, fmt.Errorf(ErrToolNotFound, tool.Name, path.Join(pathBin, tool.Name)))
+	assert.Equal(t, err, fmt.Errorf(ErrToolNotFound, tool.Name, filepath.Join(pathBin, tool.Name)))
+}
+
+func TestUpdateToolUpToDate(t *testing.T) {
+	tool := GetToolStruct()
+
+	pathBin, err := os.MkdirTemp("", "test-dir")
+	assert.Nil(t, err)
+	defer os.RemoveAll(pathBin)
+
+	// install first time
+	err = Install(pathBin, tool)
+	assert.Nil(t, err)
+
+	// remove when tool exist in path
+	err = Update(pathBin, tool)
+	assert.Equal(t, "already up to date", err.Error())
+}
+
+func TestUpdateToolDufferentVersion(t *testing.T) {
+	tool := GetToolStruct()
+
+	pathBin, err := os.MkdirTemp("", "test-dir")
+	assert.Nil(t, err)
+	defer os.RemoveAll(pathBin)
+
+	// install first time
+	err = Install(pathBin, tool)
+	assert.Nil(t, err)
+
+	// remove when tool exist in path
+	err = Update(pathBin, tool)
+	assert.Equal(t, "already up to date", err.Error())
+
+	// remove tool
+	err = Remove(pathBin, tool)
+	assert.Nil(t, err)
+
+	// update tool removed
+	// will install new one
+	err = Update(pathBin, tool)
+	assert.Nil(t, err)
+
+	// check if tool is installed post update
+	_, err = os.Stat(filepath.Join(pathBin, tool.Name))
+	assert.Nil(t, err, err)
 }

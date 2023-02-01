@@ -15,7 +15,7 @@ import (
 func Update(path string, tool Tool) error {
 	executablePath := filepath.Join(path, tool.Name)
 	if fileutil.FileExists(executablePath) {
-		if isUpToDate(tool) {
+		if isUpToDate(tool, path) {
 			return ErrIsUpToDate
 		}
 		gologger.Info().Msgf("updating %s...", tool.Name)
@@ -34,8 +34,8 @@ func Update(path string, tool Tool) error {
 	}
 }
 
-func isUpToDate(tool Tool) (latest bool) {
-	cmd := exec.Command(tool.Name, "--version")
+func isUpToDate(tool Tool, path string) (latest bool) {
+	cmd := exec.Command(filepath.Join(path, tool.Name), "--version")
 
 	var outb bytes.Buffer
 	cmd.Stdout = &outb
