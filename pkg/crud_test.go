@@ -31,6 +31,10 @@ func GetToolStruct() Tool {
 }
 
 func TestInstallTool(t *testing.T) {
+	token := os.Getenv("GITHUB_TOKEN")
+	if token == "" {
+		t.Skip("skipping test; no GITHUB_TOKEN environment variable set")
+	}
 	tool := GetToolStruct()
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
@@ -52,6 +56,10 @@ func TestInstallTool(t *testing.T) {
 }
 
 func TestRemoveTool(t *testing.T) {
+	token := os.Getenv("GITHUB_TOKEN")
+	if token == "" {
+		t.Skip("skipping test; no GITHUB_TOKEN environment variable set")
+	}
 	tool := GetToolStruct()
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
@@ -72,6 +80,10 @@ func TestRemoveTool(t *testing.T) {
 }
 
 func TestUpdateToolUpToDate(t *testing.T) {
+	token := os.Getenv("GITHUB_TOKEN")
+	if token == "" {
+		t.Skip("skipping test; no GITHUB_TOKEN environment variable set")
+	}
 	tool := GetToolStruct()
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
@@ -88,6 +100,10 @@ func TestUpdateToolUpToDate(t *testing.T) {
 }
 
 func TestUpdateToolDufferentVersion(t *testing.T) {
+	token := os.Getenv("GITHUB_TOKEN")
+	if token == "" {
+		t.Skip("skipping test; no GITHUB_TOKEN environment variable set")
+	}
 	tool := GetToolStruct()
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
