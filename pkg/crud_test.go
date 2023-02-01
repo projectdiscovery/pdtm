@@ -39,10 +39,6 @@ func TestInstallTool(t *testing.T) {
 	assert.Nil(t, err)
 	defer os.RemoveAll(pathBin)
 
-	// create directory
-	err = os.MkdirAll(pathBin, 0777)
-	assert.Nil(t, err)
-
 	// install first time
 	err = Install(pathBin, tool)
 	assert.Nil(t, err)
