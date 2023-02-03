@@ -61,7 +61,7 @@ func ParseOptions() *Options {
 	flagSet.CreateGroup("install", "Install",
 		flagSet.StringSliceVarP(&options.Install, "install", "i", nil, "install single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.BoolVarP(&options.InstallAll, "install-all", "ia", false, "install all the projects"),
-		flagSet.BoolVarP(&options.SetPath, "set-path", "sp", false, "append path to PATH environment variables"),
+		flagSet.BoolVarP(&options.SetPath, "install-path", "ip", false, "append path to PATH environment variables"),
 	)
 
 	flagSet.CreateGroup("update", "Update",
@@ -72,7 +72,7 @@ func ParseOptions() *Options {
 	flagSet.CreateGroup("remove", "Remove",
 		flagSet.StringSliceVarP(&options.Remove, "remove", "r", nil, "remove single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.BoolVarP(&options.RemoveAll, "remove-all", "ra", false, "remove all the projects"),
-		flagSet.BoolVarP(&options.UnSetPath, "unset-path", "up", false, "remove path from PATH environment variables"),
+		flagSet.BoolVarP(&options.UnSetPath, "remove-path", "rp", false, "remove path from PATH environment variables"),
 	)
 
 	flagSet.CreateGroup("debug", "Debug",
