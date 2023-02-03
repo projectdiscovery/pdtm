@@ -29,5 +29,5 @@ jobs:
         working-directory: .
         
       - name: Race Condition Tests
-        run: go build -race .
+        run: go run -race .
         working-directory: cmd/pdtm/
