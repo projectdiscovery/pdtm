@@ -117,7 +117,7 @@ func (r *Runner) Run() error {
 		}
 	}
 	if len(r.options.Install) == 0 && len(r.options.Update) == 0 && len(r.options.Remove) == 0 {
-		return r.ListTools(toolList)
+		return r.ListToolsAndEnv(toolList)
 	}
 	return nil
 }
@@ -145,17 +145,19 @@ func FetchFromCache() ([]pkg.Tool, error) {
 }
 
 // ListTools prints the list of tools
-func (r *Runner) ListTools(tools []pkg.Tool) error {
-	dirname, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
+func (r *Runner) ListToolsAndEnv(tools []pkg.Tool) error {
 	gologger.Info().Msgf(path.GetOsData() + "\n")
-	gologger.Info().Msgf("Path to download project binary: %s/.pdtm/go/bin\n\n", dirname)
-	var i int
-	for _, tool := range tools {
-		i++
-		installedVersion(i, tool)
+	gologger.Info().Msgf("Path to download project binary: %s\n\n", r.options.Path)
+	paths, _ := path.GetPaths()
+	var fmtMsg string
+	if path.IsSet(r.options.Path) {
+		fmtMsg = "Path %s configured in environment variable $PATH: %s\n"
+	} else {
+		fmtMsg = "Path %s not configured in environment variable $PATH: %s\n"
+	}
+	gologger.Info().Msgf(fmtMsg, r.options.Path, strings.Join(paths, ","))
+	for i, tool := range tools {
+		installedVersion(i+1, tool)
 	}
 	return nil
 }

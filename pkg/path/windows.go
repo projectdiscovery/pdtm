@@ -109,3 +109,16 @@ func paths() ([]string, error) {
 	}
 	return strings.Split(s, string(os.PathListSeparator)), nil
 }
+
+func isSet(path string) (bool, error) {
+	cur, err := paths()
+	if nil != err {
+		return false, err
+	}
+
+	index, err := IndexOf(cur, path)
+	if err != nil {
+		return false, err
+	}
+	return index >= 0, nil
+}

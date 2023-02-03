@@ -10,6 +10,11 @@ type Config struct {
 	rcFile    string
 }
 
+func IsSet(path string) bool {
+	ok, _ := isSet(path)
+	return ok
+}
+
 func SetENV(path string) error {
 	_, err := add(path)
 	return err
@@ -40,4 +45,8 @@ func GetOsData() string {
 	arc := runtime.GOARCH
 	goVersion := strings.ReplaceAll(runtime.Version(), "go", "")
 	return "[OS: " + strings.ToUpper(os) + "] [ARCH: " + strings.ToUpper(arc) + "] [GO: " + goVersion + "]"
+}
+
+func GetPaths() ([]string, error) {
+	return paths()
 }

@@ -33,6 +33,11 @@ func lookupConfFromShell() (*Config, bool) {
 	return nil, false
 }
 
+func isSet(path string) (bool, error) {
+	pathVars := getPathsFromEnv()
+	return sliceutil.Contains(pathVars, path), nil
+}
+
 func add(path string) (bool, error) {
 	pathVars := getPathsFromEnv()
 	if sliceutil.Contains(pathVars, path) {
