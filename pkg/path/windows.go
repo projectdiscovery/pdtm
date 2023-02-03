@@ -21,7 +21,7 @@ import (
 )
 
 func add(p string) (bool, error) {
-	cur, err := paths()
+	cur, err := getPathsFromRegistry()
 	if nil != err {
 		return false, err
 	}
@@ -44,7 +44,7 @@ func add(p string) (bool, error) {
 }
 
 func remove(p string) (bool, error) {
-	cur, err := paths()
+	cur, err := getPathsFromRegistry()
 	if nil != err {
 		return false, err
 	}
@@ -94,7 +94,12 @@ func write(path string, cur []string) error {
 	return nil
 }
 
-func paths() ([]string, error) {
+func paths() []string {
+	configuredPaths, _ := getPathsFromRegistry()
+	return configuredPaths
+}
+
+func getPathsFromRegistry() ([]string, error) {
 	k, err := registry.OpenKey(registry.CURRENT_USER, `Environment`, registry.QUERY_VALUE)
 	if err != nil {
 		return nil, fmt.Errorf("Can't open HKCU Environment for reads: %s", err)
@@ -111,7 +116,7 @@ func paths() ([]string, error) {
 }
 
 func isSet(path string) (bool, error) {
-	cur, err := paths()
+	cur, err := getPathsFromRegistry()
 	if nil != err {
 		return false, err
 	}

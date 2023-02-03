@@ -47,6 +47,6 @@ func GetOsData() string {
 	return "[OS: " + strings.ToUpper(os) + "] [ARCH: " + strings.ToUpper(arc) + "] [GO: " + goVersion + "]"
 }
 
-func GetPaths() ([]string, error) {
+func GetPaths() []string {
 	return paths()
 }

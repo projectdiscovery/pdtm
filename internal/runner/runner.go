@@ -148,7 +148,7 @@ func FetchFromCache() ([]pkg.Tool, error) {
 func (r *Runner) ListToolsAndEnv(tools []pkg.Tool) error {
 	gologger.Info().Msgf(path.GetOsData() + "\n")
 	gologger.Info().Msgf("Path to download project binary: %s\n\n", r.options.Path)
-	paths, _ := path.GetPaths()
+	paths := path.GetPaths()
 	var fmtMsg string
 	if path.IsSet(r.options.Path) {
 		fmtMsg = "Path %s configured in environment variable $PATH: %s\n"

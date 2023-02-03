@@ -34,12 +34,12 @@ func lookupConfFromShell() (*Config, bool) {
 }
 
 func isSet(path string) (bool, error) {
-	pathVars := getPathsFromEnv()
+	pathVars := paths()
 	return sliceutil.Contains(pathVars, path), nil
 }
 
 func add(path string) (bool, error) {
-	pathVars := getPathsFromEnv()
+	pathVars := paths()
 	if sliceutil.Contains(pathVars, path) {
 		return false, nil
 	}
@@ -54,7 +54,7 @@ func add(path string) (bool, error) {
 }
 
 func remove(path string) (bool, error) {
-	pathVars := getPathsFromEnv()
+	pathVars := paths()
 	if !sliceutil.Contains(pathVars, path) {
 		return false, nil
 	}
@@ -68,7 +68,7 @@ func remove(path string) (bool, error) {
 	return exportToConfig(conf, path, script)
 }
 
-func getPathsFromEnv() []string {
+func paths() []string {
 	return strings.Split(os.Getenv("PATH"), ":")
 }
 
