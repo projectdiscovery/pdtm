@@ -15,6 +15,7 @@ import (
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/pdtm/pkg"
 	"github.com/projectdiscovery/pdtm/pkg/path"
+	errorutil "github.com/projectdiscovery/utils/errors"
 )
 
 // Runner contains the internal logic of the program
@@ -31,6 +32,18 @@ func NewRunner(options *Options) (*Runner, error) {
 
 // Run the instance
 func (r *Runner) Run() error {
+	if r.options.SetPath {
+		if err := path.SetENV(r.options.Path); err != nil {
+			return errorutil.NewWithErr(err).Msgf(`Failed to set path: %s. Add %s to $PATH and run again`)
+		}
+	}
+
+	if r.options.UnSetPath {
+		if err := path.UnsetENV(r.options.Path); err != nil {
+			return errorutil.NewWithErr(err).Msgf(`Failed to set path: %s. Add %s to $PATH and run again`)
+		}
+	}
+
 	toolList, err := fetchToolList()
 
 	// if toolList is not nil save/update the cache

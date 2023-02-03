@@ -1,5 +1,4 @@
 //go:build windows
-// +build windows
 
 // from https://github.com/therootcompany/pathman with some minor changes
 package path
@@ -17,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/projectdiscovery/gologger"
+	sliceutil "github.com/projectdiscovery/utils/slice"
 	"golang.org/x/sys/windows/registry"
 )
 
@@ -36,6 +36,30 @@ func add(p string) (bool, error) {
 	}
 
 	cur = append(cur, p)
+	err = write(p, cur)
+	if nil != err {
+		return false, err
+	}
+	return true, nil
+}
+
+func remove(p string) (bool, error) {
+	cur, err := paths()
+	if nil != err {
+		return false, err
+	}
+
+	index, err := IndexOf(cur, p)
+	if err != nil {
+		return false, err
+	}
+	// skip silently, successfully
+	if index == -1 {
+		return false, nil
+	}
+
+	cur = sliceutil.PruneEqual(cur, p)
+
 	err = write(p, cur)
 	if nil != err {
 		return false, err

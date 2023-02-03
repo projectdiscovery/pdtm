@@ -15,6 +15,11 @@ func SetENV(path string) error {
 	return err
 }
 
+func UnsetENV(path string) error {
+	_, err := remove(path)
+	return err
+}
+
 func CheckOS() string {
 	os := runtime.GOOS
 	arc := runtime.GOARCH

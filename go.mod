@@ -8,8 +8,9 @@ require (
 	github.com/projectdiscovery/gologger v1.1.7
 	github.com/projectdiscovery/utils v0.0.6
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a
-	golang.org/x/sys v0.4.0
 )
+
+require golang.org/x/sys v0.4.0
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect

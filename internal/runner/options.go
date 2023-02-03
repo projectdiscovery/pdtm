@@ -1,7 +1,6 @@
 package runner
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -10,7 +9,6 @@ import (
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/gologger/formatter"
 	"github.com/projectdiscovery/gologger/levels"
-	"github.com/projectdiscovery/pdtm/pkg/path"
 	fileutil "github.com/projectdiscovery/utils/file"
 	folderutil "github.com/projectdiscovery/utils/folder"
 )
@@ -25,7 +23,8 @@ type Options struct {
 	ConfigFile string
 	Path       string
 	NoColor    bool
-	NoSetPath  bool
+	SetPath    bool
+	UnSetPath  bool
 
 	Install goflags.StringSlice
 	Update  goflags.StringSlice
@@ -57,12 +56,12 @@ func ParseOptions() *Options {
 	flagSet.CreateGroup("config", "Config",
 		flagSet.StringVar(&options.ConfigFile, "config", defaultConfigLocation, "cli flag configuration file"),
 		flagSet.StringVarP(&options.Path, "binary-path", "bp", defaultPath, "custom location to download project binary"),
-		flagSet.BoolVarP(&options.NoSetPath, "no-set-path", "nsp", false, "disable adding path to environment variables"),
 	)
 
 	flagSet.CreateGroup("install", "Install",
 		flagSet.StringSliceVarP(&options.Install, "install", "i", nil, "install single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.BoolVarP(&options.InstallAll, "install-all", "ia", false, "install all the projects"),
+		flagSet.BoolVarP(&options.SetPath, "set-path", "sp", false, "append path to PATH environment variables"),
 	)
 
 	flagSet.CreateGroup("update", "Update",
@@ -73,6 +72,7 @@ func ParseOptions() *Options {
 	flagSet.CreateGroup("remove", "Remove",
 		flagSet.StringSliceVarP(&options.Remove, "remove", "r", nil, "remove single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.BoolVarP(&options.RemoveAll, "remove-all", "ra", false, "remove all the projects"),
+		flagSet.BoolVarP(&options.UnSetPath, "unset-path", "up", false, "remove path from PATH environment variables"),
 	)
 
 	flagSet.CreateGroup("debug", "Debug",
@@ -83,8 +83,7 @@ func ParseOptions() *Options {
 	)
 
 	if err := flagSet.Parse(); err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+		gologger.Fatal().Msgf("%s\n", err)
 	}
 
 	// configure aurora for logging
@@ -109,19 +108,6 @@ func ParseOptions() *Options {
 		_ = options.loadConfigFrom(options.ConfigFile)
 	}
 
-	// Validate the options passed by the user and if any
-	// invalid options have been used, exit.
-	err = options.validateOptions()
-	if err != nil {
-		gologger.Fatal().Msgf("pdtm error: %s\n", err)
-	}
-
-	if options.Path == defaultPath && !options.NoSetPath {
-		if err := path.SetENV(defaultPath); err != nil {
-			gologger.Warning().Msgf("Failed to set path: %s. Add ~/.pdtm/go/bin/ to $PATH and run again", err)
-		}
-	}
-
 	return options
 }
 
@@ -142,9 +128,4 @@ func (options *Options) configureOutput() {
 
 func (Options *Options) loadConfigFrom(location string) error {
 	return fileutil.Unmarshal(fileutil.YAML, []byte(location), Options)
-}
-
-// validateOptions validates the configuration options passed
-func (options *Options) validateOptions() error {
-	return nil
 }
