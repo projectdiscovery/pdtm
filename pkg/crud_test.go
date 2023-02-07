@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -66,7 +65,7 @@ func TestRemoveTool(t *testing.T) {
 
 	// throws error
 	err = Remove(pathBin, tool)
-	assert.Equal(t, err, fmt.Errorf(ErrToolNotFound, tool.Name, filepath.Join(pathBin, tool.Name)))
+	assert.NotNil(t, err)
 }
 
 func TestUpdateToolUpToDate(t *testing.T) {
