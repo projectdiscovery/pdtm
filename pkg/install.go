@@ -17,15 +17,14 @@ import (
 
 	"github.com/projectdiscovery/gologger"
 	ospath "github.com/projectdiscovery/pdtm/pkg/path"
-	fileutil "github.com/projectdiscovery/utils/file"
 )
 
 var extIfFound = ".exe"
 
 // Install installs given tool at path
 func Install(path string, tool Tool) error {
-	executablePath := ospath.GetExecutablePath(path, tool.Name)
-	if fileutil.FileExists(executablePath) {
+	executablePath, exists := ospath.GetExecutablePath(path, tool.Name)
+	if exists {
 		gologger.Info().Msgf("%s is already present in path %s: skipping installation", tool.Name, executablePath)
 		return ErrIsInstalled
 	}

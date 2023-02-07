@@ -13,6 +13,8 @@ type Config struct {
 	rcFile    string
 }
 
+var CommonExtensions = []string{"", ".exe", ".bat"}
+
 func SetENV(path string) error {
 	_, err := add(path)
 	return err
@@ -40,10 +42,18 @@ func GetOsData() string {
 	return "[OS: " + strings.ToUpper(os) + "] [ARCH: " + strings.ToUpper(arc) + "] [GO: " + goVersion + "]"
 }
 
-func GetExecutablePath(path, toolName string) string {
-	executablePath := filepath.Join(path, toolName)
-	if fileutil.FileExists(executablePath + ".exe") {
-		executablePath = executablePath + ".exe"
+func GetExecutablePath(path, toolName string) (string, bool) {
+	basePath := filepath.Join(path, toolName)
+	for _, ext := range CommonExtensions {
+		executablePath := basePath + ext
+		if fileutil.FileExists(executablePath) {
+			return executablePath, true
+		}
 	}
-	return executablePath
+
+	if runtime.GOOS == "windows" {
+		return basePath + ".exe", false
+	}
+
+	return basePath, false
 }

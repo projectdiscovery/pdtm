@@ -23,7 +23,10 @@ func GithubClient() *github.Client {
 	}
 	if rateLimit.Core.Remaining <= 0 {
 		gologger.Error().Msgf("error for remaining request per hour: %s", err.Error())
-
+		if arlErr, ok := err.(*github.AbuseRateLimitError); ok {
+			// Provide user with more info regarding the rate limit
+			gologger.Error().Msgf("error for remaining request per hour: %s, RetryAfter: %s", err.Error(), arlErr.RetryAfter)
+		}
 	}
 	return githubClient
 }
