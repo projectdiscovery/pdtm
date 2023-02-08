@@ -35,7 +35,7 @@ func add(path string) (bool, error) {
 		return false, err
 	}
 	shell := filepath.Base(os.Getenv("SHELL"))
-	script := fmt.Sprintf("export PATH=%s:$PATH\n\n", path)
+	script := fmt.Sprintf("export PATH=$PATH:%s\n\n", path)
 	for _, c := range confList {
 		if c.shellName == shell {
 			b, err := os.ReadFile(filepath.Join(home, c.rcFile))
