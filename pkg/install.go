@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/google/go-github/github"
 	"github.com/projectdiscovery/gologger"
 	ospath "github.com/projectdiscovery/pdtm/pkg/path"
 )
@@ -23,8 +24,7 @@ var extIfFound = ".exe"
 
 // Install installs given tool at path
 func Install(path string, tool Tool) error {
-	executablePath, exists := ospath.GetExecutablePath(path, tool.Name)
-	if exists {
+	if executablePath, exists := ospath.GetExecutablePath(path, tool.Name); exists {
 		gologger.Info().Msgf("%s is already present in path %s: skipping installation", tool.Name, executablePath)
 		return ErrIsInstalled
 	}
@@ -78,6 +78,10 @@ loop:
 
 	_, rdurl, err := GithubClient().Repositories.DownloadReleaseAsset(context.Background(), Organization, tool.Repo, int64(id))
 	if err != nil {
+		if arlErr, ok := err.(*github.AbuseRateLimitError); ok {
+			// Provide user with more info regarding the rate limit
+			gologger.Error().Msgf("error for remaining request per hour: %s, RetryAfter: %s", err.Error(), arlErr.RetryAfter)
+		}
 		return "", err
 	}
 
