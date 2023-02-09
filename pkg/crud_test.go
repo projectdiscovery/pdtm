@@ -2,10 +2,7 @@ package pkg
 
 import (
 	"os"
-	"path/filepath"
 	"testing"
-
-	fileutils "github.com/projectdiscovery/utils/file"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -107,8 +104,4 @@ func TestUpdateToolDufferentVersion(t *testing.T) {
 	// will install new one
 	err = Update(pathBin, tool)
 	assert.Nil(t, err)
-
-	// check if tool is installed post update
-	fileExist := fileutils.FileExists(filepath.Join(pathBin, tool.Name)) || fileutils.FileExists(filepath.Join(pathBin, tool.Name+".exe"))
-	assert.True(t, fileExist)
 }

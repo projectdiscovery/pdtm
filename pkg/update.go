@@ -30,7 +30,7 @@ func Update(path string, tool Tool) error {
 		return nil
 	} else {
 		gologger.Info().Msgf("%s: not found in path %s", tool.Name, executablePath)
-		return Install(path, tool)
+		return nil
 	}
 }
 
