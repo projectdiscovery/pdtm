@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -30,7 +31,7 @@ func Update(path string, tool Tool) error {
 		return nil
 	} else {
 		gologger.Info().Msgf("%s: not found in path %s", tool.Name, executablePath)
-		return nil
+		return fmt.Errorf(ErrToolNotFound, tool.Name, executablePath)
 	}
 }
 

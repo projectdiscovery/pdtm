@@ -28,7 +28,7 @@ func GetToolStruct() Tool {
 	return tool
 }
 
-func TestInstallTool(t *testing.T) {
+func TestInstall(t *testing.T) {
 	tool := GetToolStruct()
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
@@ -39,69 +39,55 @@ func TestInstallTool(t *testing.T) {
 	err = Install(pathBin, tool)
 	assert.Nil(t, err)
 
-	// check if its installed in path
-	// need to throw exeption
+	// installing again should trigger an error
 	err = Install(pathBin, tool)
 	assert.NotNil(t, err)
 }
 
-func TestRemoveTool(t *testing.T) {
+func TestRemove(t *testing.T) {
 	tool := GetToolStruct()
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
 	assert.Nil(t, err)
 	defer os.RemoveAll(pathBin)
 
-	// install first time
+	// install the tool
 	err = Install(pathBin, tool)
 	assert.Nil(t, err)
 
-	// remove when tool exist in path
+	// remove it from path
 	err = Remove(pathBin, tool)
 	assert.Nil(t, err)
 
-	// throws error
+	// removing non existing tool triggers an error
 	err = Remove(pathBin, tool)
 	assert.NotNil(t, err)
 }
 
-func TestUpdateToolUpToDate(t *testing.T) {
+func TestUpdateSameVersion(t *testing.T) {
 	tool := GetToolStruct()
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
 	assert.Nil(t, err)
 	defer os.RemoveAll(pathBin)
 
-	// install first time
+	// install the tool
 	err = Install(pathBin, tool)
 	assert.Nil(t, err)
 
-	// remove when tool exist in path
+	// updating a tool to the same version should trigger an error
 	err = Update(pathBin, tool)
 	assert.Equal(t, "already up to date", err.Error())
 }
 
-func TestUpdateToolDufferentVersion(t *testing.T) {
+func TestUpdateNonExistingTool(t *testing.T) {
 	tool := GetToolStruct()
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
 	assert.Nil(t, err)
 	defer os.RemoveAll(pathBin)
 
-	// install first time
-	err = Install(pathBin, tool)
-	assert.Nil(t, err)
-
-	// remove when tool exist in path
+	// updating non existing tool should error
 	err = Update(pathBin, tool)
-	assert.Equal(t, "already up to date", err.Error())
-
-	// remove tool
-	err = Remove(pathBin, tool)
-	assert.Nil(t, err)
-
-	// update tool removed
-	// will install new one
-	err = Update(pathBin, tool)
-	assert.Nil(t, err)
+	assert.NotNil(t, err)
 }
