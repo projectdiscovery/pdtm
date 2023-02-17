@@ -68,7 +68,7 @@ func (r *Runner) Run() error {
 
 	for _, tool := range r.options.Install {
 		if i, ok := contains(toolList, tool); ok {
-			if err := pkg.Install(toolList[i], r.options.Path); err != nil {
+			if err := pkg.Install(r.options.Path, toolList[i]); err != nil {
 				if err == pkg.ErrIsInstalled {
 					gologger.Info().Msgf("%s: %s", tool, err)
 				} else {
@@ -81,7 +81,7 @@ func (r *Runner) Run() error {
 	}
 	for _, tool := range r.options.Update {
 		if i, ok := contains(toolList, tool); ok {
-			if err := pkg.Update(toolList[i], r.options.Path); err != nil {
+			if err := pkg.Update(r.options.Path, toolList[i]); err != nil {
 				if err == pkg.ErrIsUpToDate {
 					gologger.Info().Msgf("%s: %s", tool, err)
 				} else {
@@ -92,7 +92,7 @@ func (r *Runner) Run() error {
 	}
 	for _, tool := range r.options.Remove {
 		if i, ok := contains(toolList, tool); ok {
-			if err := pkg.Remove(toolList[i]); err != nil {
+			if err := pkg.Remove(r.options.Path, toolList[i]); err != nil {
 				var notFoundError *exec.Error
 				if errors.As(err, &notFoundError) {
 					gologger.Info().Msgf("%s: not found", tool)

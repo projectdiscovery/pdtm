@@ -1,24 +1,25 @@
 package pkg
 
 import (
+	"fmt"
 	"os"
-	"os/exec"
+
+	ospath "github.com/projectdiscovery/pdtm/pkg/path"
 
 	"github.com/projectdiscovery/gologger"
 )
 
 // Remove removes given tool
-func Remove(tool Tool) error {
-	executablePath, err := exec.LookPath(tool.Name)
-	if err != nil {
-		return err
+func Remove(path string, tool Tool) error {
+	executablePath, exists := ospath.GetExecutablePath(path, tool.Name)
+	if exists {
+		gologger.Info().Msgf("removing %s...", tool.Name)
+		err := os.Remove(executablePath)
+		if err != nil {
+			return err
+		}
+		gologger.Info().Msgf("removed %s", tool.Name)
+		return nil
 	}
-	gologger.Info().Msgf("removing %s...", tool.Name)
-
-	err = os.Remove(executablePath)
-	if err != nil {
-		return err
-	}
-	gologger.Info().Msgf("removed %s", tool.Name)
-	return nil
+	return fmt.Errorf(ErrToolNotFound, tool.Name, executablePath)
 }

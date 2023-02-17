@@ -26,10 +26,14 @@ jobs:
       - name: Dry Run - No Tool Installed
         run: go run .
         working-directory: cmd/pdtm/
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Install Run - Setup All The Tools
         run: go run . -ia
         working-directory: cmd/pdtm/
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Add binaries folder to ENV PATH (Unix-Like)
         if: runner.os != 'Windows'
@@ -50,6 +54,8 @@ jobs:
       - name: Update Run - Update All The Tools
         run: go run . -ua
         working-directory: cmd/pdtm/
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       
       - name: Remove Run - Remove All The Tools
         run: go run . -ra
