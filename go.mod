@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/projectdiscovery/goflags v0.1.6
+	github.com/projectdiscovery/goflags v0.1.7
 	github.com/projectdiscovery/gologger v1.1.8
 	github.com/projectdiscovery/utils v0.0.9
 	github.com/stretchr/testify v1.8.1
