@@ -18,9 +18,9 @@ func GetVersionCheckCallback(toolName string, output io.Writer) func() {
 			gologger.Error().Msg(err.Error())
 			return
 		}
-		i, exits := -1, false
-		if i, exits = Contains(tools, toolName); !exits {
-			gologger.Error().Msg(err.Error())
+		i, exits := Contains(tools, toolName)
+		if !exits {
+			gologger.Error().Msgf("%v: not found", toolName)
 			return
 		}
 		msg := InstalledVersion(tools[i], au)
