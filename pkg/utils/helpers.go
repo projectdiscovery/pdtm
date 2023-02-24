@@ -39,9 +39,9 @@ func GetUpdaterCallback(toolName string) func() {
 		if err != nil {
 			gologger.Error().Msg(err.Error())
 		}
-		i, exits := -1, false
-		if i, exits = Contains(tools, toolName); !exits {
-			gologger.Error().Msgf("%s doesn't exits", toolName)
+		i, exits := Contains(tools, toolName)
+		if !exits {
+			gologger.Error().Msgf("%v: not found", toolName)
 			return
 		}
 		err = pkg.Update(dp, tools[i])
