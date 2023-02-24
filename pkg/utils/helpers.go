@@ -15,15 +15,18 @@ func GetVersionCheckCallback(toolName string, output io.Writer) func() {
 	return func() {
 		tools, err := FetchToolList()
 		if err != nil {
-			output.Write([]byte(err.Error()))
+			gologger.Error().Msg(err.Error())
+			return
 		}
 		i, exits := -1, false
 		if i, exits = Contains(tools, toolName); !exits {
-			output.Write([]byte(fmt.Sprintf("error: %s doesn't exits", toolName)))
+			gologger.Error().Msg(err.Error())
 			return
 		}
 		msg := InstalledVersion(tools[i], au)
-		output.Write([]byte(fmt.Sprintf("%s %s", toolName, msg)))
+		if _, err = output.Write([]byte(fmt.Sprintf("%s %s", toolName, msg))); err != nil {
+			gologger.Error().Msg(err.Error())
+		}
 	}
 }
 
