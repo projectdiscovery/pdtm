@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
@@ -11,22 +10,13 @@ import (
 )
 
 // returns a callback function and when it is executed returns a version string of that tool
-func GetVersionCheckCallback(toolName string, output io.Writer) func() {
-	return func() {
-		tools, err := FetchToolList()
+func GetVersionCheckCallback(toolName string) func() string {
+	return func() string {
+		tool, err := fetchTool(toolName)
 		if err != nil {
-			gologger.Error().Msg(err.Error())
-			return
+			return err.Error()
 		}
-		i, exits := Contains(tools, toolName)
-		if !exits {
-			gologger.Error().Msgf("%v: not found", toolName)
-			return
-		}
-		msg := InstalledVersion(tools[i], au)
-		if _, err = output.Write([]byte(fmt.Sprintf("%s %s", toolName, msg))); err != nil {
-			gologger.Error().Msg(err.Error())
-		}
+		return fmt.Sprintf("%s %s", toolName, InstalledVersion(tool, au))
 	}
 }
 
@@ -35,16 +25,11 @@ func GetUpdaterCallback(toolName string) func() {
 	return func() {
 		home, _ := os.UserHomeDir()
 		dp := filepath.Join(home, ".pdtm/go/bin")
-		tools, err := FetchToolList()
+		tool, err := fetchTool(toolName)
 		if err != nil {
 			gologger.Error().Msg(err.Error())
 		}
-		i, exits := Contains(tools, toolName)
-		if !exits {
-			gologger.Error().Msgf("%v: not found", toolName)
-			return
-		}
-		err = pkg.Update(dp, tools[i])
+		err = pkg.Update(dp, tool)
 		if err == pkg.ErrIsUpToDate {
 			gologger.Info().Msgf("%s: %s", toolName, err)
 		} else {

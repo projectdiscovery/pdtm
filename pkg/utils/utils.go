@@ -51,6 +51,30 @@ func FetchToolList() ([]pkg.Tool, error) {
 	return nil, nil
 }
 
+func fetchTool(toolName string) (pkg.Tool, error) {
+	var tool pkg.Tool
+	// Create the request URL to get tool
+	reqURL := host + "/api/v1/tools/" + toolName
+	resp, err := http.Get(reqURL)
+	if err != nil {
+		return tool, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return tool, err
+		}
+		err = json.Unmarshal(body, &tool)
+		if err != nil {
+			return tool, err
+		}
+		return tool, nil
+	}
+	return tool, nil
+}
+
 func Contains(s []pkg.Tool, toolName string) (int, bool) {
 	for i, a := range s {
 		if strings.EqualFold(a.Name, toolName) {
