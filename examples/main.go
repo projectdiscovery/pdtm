@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/projectdiscovery/goflags"
 	"github.com/projectdiscovery/pdtm/pkg/utils"
@@ -15,23 +14,19 @@ type options struct {
 func main() {
 	options := &options{}
 	flagSet := goflags.NewFlagSet()
+	toolName := "nuclei"
 
 	flagSet.CreateGroup("update", "Update",
-		flagSet.CallbackVarP(utils.GetUpdaterCallback("subfinder"), "update", "up", "update pdtm to the latest released version"),
+		flagSet.CallbackVarP(utils.GetUpdaterCallback(toolName), "update", "up", fmt.Sprintf("update %v to the latest released version", toolName)),
 		flagSet.BoolVarP(&options.DisableUpdateCheck, "disable-update-check", "duc", false, "disable automatic update check"),
 	)
 
 	if err := flagSet.Parse(); err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+		panic(err)
 	}
 
-	runWithOptions(options)
-}
-
-func runWithOptions(options *options) {
 	if !options.DisableUpdateCheck {
-		msg := utils.GetVersionCheckCallback("subfinder")()
+		msg := utils.GetVersionCheckCallback(toolName)()
 		fmt.Println(msg)
 	}
 }
