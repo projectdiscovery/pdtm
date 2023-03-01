@@ -1,8 +1,11 @@
 package path
 
 import (
+	"path/filepath"
 	"runtime"
 	"strings"
+
+	fileutil "github.com/projectdiscovery/utils/file"
 )
 
 type Config struct {
@@ -14,6 +17,8 @@ func IsSet(path string) bool {
 	ok, _ := isSet(path)
 	return ok
 }
+
+var CommonExtensions = []string{"", ".exe", ".bat"}
 
 func SetENV(path string) error {
 	_, err := add(path)
@@ -49,4 +54,20 @@ func GetOsData() string {
 
 func GetPaths() []string {
 	return paths()
+}
+
+func GetExecutablePath(path, toolName string) (string, bool) {
+	basePath := filepath.Join(path, toolName)
+	for _, ext := range CommonExtensions {
+		executablePath := basePath + ext
+		if fileutil.FileExists(executablePath) {
+			return executablePath, true
+		}
+	}
+
+	if runtime.GOOS == "windows" {
+		return basePath + ".exe", false
+	}
+
+	return basePath, false
 }
