@@ -156,15 +156,17 @@ func (r *Runner) ListToolsAndEnv(tools []pkg.Tool) error {
 	}
 	gologger.Info().Msgf(fmtMsg, r.options.Path)
 	for i, tool := range tools {
-		installedVersion(i+1, tool)
+		r.installedVersion(i+1, tool)
 	}
 	return nil
 }
 
-func installedVersion(i int, tool pkg.Tool) string {
+func (r *Runner) installedVersion(i int, tool pkg.Tool) string {
 	var msg string
 
-	cmd := exec.Command(tool.Name, "--version")
+	toolName, _ := path.GetExecutablePath(r.options.Path, tool.Name)
+
+	cmd := exec.Command(toolName, "--version")
 
 	var outb bytes.Buffer
 	cmd.Stdout = &outb
