@@ -148,14 +148,13 @@ func FetchFromCache() ([]pkg.Tool, error) {
 func (r *Runner) ListToolsAndEnv(tools []pkg.Tool) error {
 	gologger.Info().Msgf(path.GetOsData() + "\n")
 	gologger.Info().Msgf("Path to download project binary: %s\n\n", r.options.Path)
-	paths := path.GetPaths()
 	var fmtMsg string
 	if path.IsSet(r.options.Path) {
-		fmtMsg = "Path %s configured in environment variable $PATH: %s\n"
+		fmtMsg = "Path %s configured in environment variable $PATH\n"
 	} else {
-		fmtMsg = "Path %s not configured in environment variable $PATH: %s\n"
+		fmtMsg = "Path %s not configured in environment variable $PATH\n"
 	}
-	gologger.Info().Msgf(fmtMsg, r.options.Path, strings.Join(paths, ","))
+	gologger.Info().Msgf(fmtMsg, r.options.Path)
 	for i, tool := range tools {
 		installedVersion(i+1, tool)
 	}

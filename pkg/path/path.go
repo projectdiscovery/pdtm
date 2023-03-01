@@ -52,10 +52,6 @@ func GetOsData() string {
 	return "[OS: " + strings.ToUpper(os) + "] [ARCH: " + strings.ToUpper(arc) + "] [GO: " + goVersion + "]"
 }
 
-func GetPaths() []string {
-	return paths()
-}
-
 func GetExecutablePath(path, toolName string) (string, bool) {
 	basePath := filepath.Join(path, toolName)
 	for _, ext := range CommonExtensions {
