@@ -1,0 +1,62 @@
+name: 🔨 Setup Test
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build:
+    name: Test Setups
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest-16-cores, windows-latest-8-cores, macOS-latest]
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Dry Run - No Tool Installed
+        run: go run .
+        working-directory: cmd/pdtm/
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Install Run - Setup All The Tools
+        run: go run . -ia
+        working-directory: cmd/pdtm/
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Add binaries folder to ENV PATH (Unix-Like)
+        if: runner.os != 'Windows'
+        run: go run . -show-path -nsp >> $GITHUB_PATH
+        working-directory: cmd/pdtm/
+
+      - name: Add binaries folder to ENV PATH (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          go run . -show-path -nsp | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        working-directory: cmd/pdtm/
+
+      - name: Checking tools existence
+        run: |
+          go run . | grep -vz "not installed"
+        working-directory: cmd/pdtm/
+
+      - name: Update Run - Update All The Tools
+        run: go run . -ua
+        working-directory: cmd/pdtm/
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      
+      - name: Remove Run - Remove All The Tools
+        run: go run . -ra
+        working-directory: cmd/pdtm/

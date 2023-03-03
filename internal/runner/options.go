@@ -25,6 +25,7 @@ type Options struct {
 	ConfigFile string
 	Path       string
 	NoColor    bool
+	NoSetPath  bool
 
 	Install goflags.StringSlice
 	Update  goflags.StringSlice
@@ -34,9 +35,10 @@ type Options struct {
 	UpdateAll  bool
 	RemoveAll  bool
 
-	Verbose bool
-	Silent  bool
-	Version bool
+	Verbose  bool
+	Silent   bool
+	Version  bool
+	ShowPath bool
 }
 
 // ParseOptions parses the command line flags provided by a user
@@ -50,29 +52,33 @@ func ParseOptions() *Options {
 	options := &Options{}
 	flagSet := goflags.NewFlagSet()
 
+	flagSet.SetDescription(`pdtm is a simple and easy-to-use golang based tool for managing open source projects from ProjectDiscovery`)
+
 	flagSet.CreateGroup("config", "Config",
 		flagSet.StringVar(&options.ConfigFile, "config", defaultConfigLocation, "cli flag configuration file"),
 		flagSet.StringVarP(&options.Path, "binary-path", "bp", defaultPath, "custom location to download project binary"),
+		flagSet.BoolVarP(&options.NoSetPath, "no-set-path", "nsp", false, "disable adding path to environment variables"),
 	)
 
 	flagSet.CreateGroup("install", "Install",
-		flagSet.StringSliceVarP(&options.Install, "install", "i", []string{}, "install single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Install, "install", "i", nil, "install single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.BoolVarP(&options.InstallAll, "install-all", "ia", false, "install all the projects"),
 	)
 
 	flagSet.CreateGroup("update", "Update",
-		flagSet.StringSliceVarP(&options.Update, "update", "u", []string{}, "update single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Update, "update", "u", nil, "update single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.BoolVarP(&options.UpdateAll, "update-all", "ua", false, "update all the projects"),
 	)
 
 	flagSet.CreateGroup("remove", "Remove",
-		flagSet.StringSliceVarP(&options.Remove, "remove", "r", []string{}, "remove single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
+		flagSet.StringSliceVarP(&options.Remove, "remove", "r", nil, "remove single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.BoolVarP(&options.RemoveAll, "remove-all", "ra", false, "remove all the projects"),
 	)
 
 	flagSet.CreateGroup("debug", "Debug",
+		flagSet.BoolVarP(&options.ShowPath, "show-path", "sp", false, "show the current binary path then exit"),
 		flagSet.BoolVar(&options.Version, "version", false, "show version of the project"),
-		flagSet.BoolVar(&options.Verbose, "v", false, "show verbose output"),
+		flagSet.BoolVarP(&options.Verbose, "verbose", "v", false, "show verbose output"),
 		flagSet.BoolVarP(&options.NoColor, "no-color", "nc", false, "disable output content coloring (ANSI escape codes)"),
 	)
 
@@ -93,6 +99,12 @@ func ParseOptions() *Options {
 		os.Exit(0)
 	}
 
+	if options.ShowPath {
+		// prints default path if not modified
+		gologger.Silent().Msg(options.Path)
+		os.Exit(0)
+	}
+
 	if options.ConfigFile != defaultConfigLocation {
 		_ = options.loadConfigFrom(options.ConfigFile)
 	}
@@ -104,11 +116,10 @@ func ParseOptions() *Options {
 		gologger.Fatal().Msgf("pdtm error: %s\n", err)
 	}
 
-	if options.Path == defaultPath {
+	if options.Path == defaultPath && !options.NoSetPath {
 		if err := path.SetENV(defaultPath); err != nil {
-			gologger.Fatal().Msgf("Failed to set path: %s. Add ~/.pdtm/go/bin/ to $PATH and run again", err)
+			gologger.Warning().Msgf("Failed to set path: %s. Add ~/.pdtm/go/bin/ to $PATH and run again", err)
 		}
-
 	}
 
 	return options
