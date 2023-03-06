@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-latest-16-cores, windows-latest-8-cores, macOS-latest]
     steps:
       - name: Set up Go
         uses: actions/setup-go@v3
@@ -33,3 +33,7 @@ jobs:
       - name: Race Condition Tests
         run: go run -race .
         working-directory: cmd/pdtm/
+      
+      - name: Test Example Code
+        run: go run .
+        working-directory: examples/
