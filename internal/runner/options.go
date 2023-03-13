@@ -10,11 +10,22 @@ import (
 	"github.com/projectdiscovery/gologger/formatter"
 	"github.com/projectdiscovery/gologger/levels"
 	fileutil "github.com/projectdiscovery/utils/file"
-	folderutil "github.com/projectdiscovery/utils/folder"
 )
 
-var defaultConfigLocation = filepath.Join(folderutil.HomeDirOrDefault("."), ".config/pdtm/config.yaml")
-var cacheFile = filepath.Join(folderutil.HomeDirOrDefault("."), ".config/pdtm/cache.json")
+var (
+	// retrieve home directory or fail
+	homeDir = func() string {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			gologger.Fatal().Msgf("Failed to get user home directory: %s", err)
+		}
+		return home
+	}()
+
+	defaultConfigLocation = filepath.Join(homeDir, ".config/pdtm/config.yaml")
+	cacheFile             = filepath.Join(homeDir, ".config/pdtm/cache.json")
+	defaultPath           = filepath.Join(homeDir, ".pdtm/go/bin")
+)
 
 var au *aurora.Aurora
 
@@ -42,12 +53,6 @@ type Options struct {
 
 // ParseOptions parses the command line flags provided by a user
 func ParseOptions() *Options {
-	var err error
-	home, err := os.UserHomeDir()
-	if err != nil {
-		gologger.Fatal().Msgf("Failed to get user home directory: %s", err)
-	}
-	defaultPath := filepath.Join(home, ".pdtm/go/bin")
 	options := &Options{}
 	flagSet := goflags.NewFlagSet()
 

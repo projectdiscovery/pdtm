@@ -28,7 +28,8 @@ func NewRunner(options *Options) (*Runner, error) {
 
 // Run the instance
 func (r *Runner) Run() error {
-	if r.options.SetPath {
+	// add default path to $PATH
+	if r.options.SetPath || r.options.Path == defaultPath {
 		if err := path.SetENV(r.options.Path); err != nil {
 			return errorutil.NewWithErr(err).Msgf(`Failed to set path: %s. Add %s to $PATH and run again`)
 		}
