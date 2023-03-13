@@ -77,6 +77,10 @@ func (r *Runner) Run() error {
 	gologger.Verbose().Msgf("using path %s", r.options.Path)
 
 	for _, tool := range r.options.Install {
+		if !path.IsSubPath(homeDir, r.options.Path) {
+			gologger.Error().Msgf("skipping install outside home folder: %s", tool)
+			continue
+		}
 		if i, ok := utils.Contains(toolList, tool); ok {
 			if err := pkg.Install(r.options.Path, toolList[i]); err != nil {
 				if err == pkg.ErrIsInstalled {
@@ -90,6 +94,10 @@ func (r *Runner) Run() error {
 		}
 	}
 	for _, tool := range r.options.Update {
+		if !path.IsSubPath(homeDir, r.options.Path) {
+			gologger.Error().Msgf("skipping update outside home folder: %s", tool)
+			continue
+		}
 		if i, ok := utils.Contains(toolList, tool); ok {
 			if err := pkg.Update(r.options.Path, toolList[i]); err != nil {
 				if err == pkg.ErrIsUpToDate {
@@ -101,6 +109,10 @@ func (r *Runner) Run() error {
 		}
 	}
 	for _, tool := range r.options.Remove {
+		if !path.IsSubPath(homeDir, r.options.Path) {
+			gologger.Error().Msgf("skipping remove outside home folder: %s", tool)
+			continue
+		}
 		if i, ok := utils.Contains(toolList, tool); ok {
 			if err := pkg.Remove(r.options.Path, toolList[i]); err != nil {
 				var notFoundError *exec.Error
@@ -153,9 +165,7 @@ func (r *Runner) ListToolsAndEnv(tools []pkg.Tool) error {
 	}
 	gologger.Info().Msgf(fmtMsg, r.options.Path)
 
-	var i int
-	for _, tool := range tools {
-		i++
+	for i, tool := range tools {
 		msg := utils.InstalledVersion(tool, au)
 		fmt.Printf("%d. %s %s\n", i, tool.Name, msg)
 	}
