@@ -3,12 +3,15 @@
 package path
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/projectdiscovery/gologger"
+	errorutil "github.com/projectdiscovery/utils/errors"
+	fileutil "github.com/projectdiscovery/utils/file"
 	sliceutil "github.com/projectdiscovery/utils/slice"
 )
 
@@ -23,14 +26,30 @@ var confList = []*Config{
 	},
 }
 
-func lookupConfFromShell() (*Config, bool) {
+func (c *Config) GetRCFilePath() (string, error) {
+	home, err := os.UserHomeDir()
+	if nil != err {
+		return "", err
+	}
+	rcFilePath := filepath.Join(home, c.rcFile)
+	if fileutil.FileExists(rcFilePath) {
+		return rcFilePath, nil
+	}
+
+	return "", fmt.Errorf(`rcfile "%s" not found`, rcFilePath)
+}
+
+func lookupConfFromShell() (*Config, error) {
 	shell := filepath.Base(os.Getenv("SHELL"))
 	for _, conf := range confList {
 		if conf.shellName == shell {
-			return conf, true
+			if _, err := conf.GetRCFilePath(); err != nil {
+				return nil, err
+			}
+			return conf, nil
 		}
 	}
-	return nil, false
+	return nil, errors.New("shell not supported")
 }
 
 func isSet(path string) (bool, error) {
@@ -44,9 +63,9 @@ func add(path string) (bool, error) {
 		return false, nil
 	}
 
-	conf, ok := lookupConfFromShell()
-	if !ok {
-		return false, fmt.Errorf("shell not supported, add %s to $PATH env", path)
+	conf, err := lookupConfFromShell()
+	if err != nil {
+		return false, errorutil.NewWithErr(err).Msgf("add %s to $PATH env", path)
 	}
 
 	script := fmt.Sprintf("export PATH=$PATH:%s\n\n", path)
@@ -59,9 +78,9 @@ func remove(path string) (bool, error) {
 		return false, nil
 	}
 
-	conf, ok := lookupConfFromShell()
-	if !ok {
-		return false, fmt.Errorf("shell not supported, add %s to $PATH env", path)
+	conf, err := lookupConfFromShell()
+	if err != nil {
+		return false, errorutil.NewWithErr(err).Msgf("remove %s from $PATH env", path)
 	}
 	pathVars = sliceutil.PruneEqual(pathVars, path)
 	script := fmt.Sprintf("export PATH=%s\n\n", strings.Join(pathVars, ":"))
@@ -73,12 +92,12 @@ func paths() []string {
 }
 
 func exportToConfig(config *Config, path, script string) (bool, error) {
-	home, err := os.UserHomeDir()
-	if nil != err {
+	rcFilePath, err := config.GetRCFilePath()
+	if err != nil {
 		return false, err
 	}
-	b, err := os.ReadFile(filepath.Join(home, config.rcFile))
-	if nil != err {
+	b, err := os.ReadFile(rcFilePath)
+	if err != nil {
 		return false, err
 	}
 
@@ -89,7 +108,7 @@ func exportToConfig(config *Config, path, script string) (bool, error) {
 			return true, nil
 		}
 	}
-	f, err := os.OpenFile(filepath.Join(home, config.rcFile), os.O_APPEND|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(rcFilePath, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		return false, err
 	}

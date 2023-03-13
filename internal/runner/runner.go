@@ -31,13 +31,13 @@ func (r *Runner) Run() error {
 	// add default path to $PATH
 	if r.options.SetPath || r.options.Path == defaultPath {
 		if err := path.SetENV(r.options.Path); err != nil {
-			return errorutil.NewWithErr(err).Msgf(`Failed to set path: %s. Add %s to $PATH and run again`)
+			return errorutil.NewWithErr(err).Msgf(`Failed to set path: %s. Add it to $PATH and run again`, r.options.Path)
 		}
 	}
 
 	if r.options.UnSetPath {
 		if err := path.UnsetENV(r.options.Path); err != nil {
-			return errorutil.NewWithErr(err).Msgf(`Failed to set path: %s. Add %s to $PATH and run again`)
+			return errorutil.NewWithErr(err).Msgf(`Failed to unset path: %s. Remove it from $PATH and run again`, r.options.Path)
 		}
 	}
 
