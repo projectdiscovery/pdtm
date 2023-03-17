@@ -4,9 +4,10 @@ import (
 	"fmt"
 
 	"github.com/projectdiscovery/gologger"
+    updateutils "github.com/projectdiscovery/utils/update"
 )
 
-const Version = "v0.0.4"
+const version = "v0.0.4"
 
 var banner = fmt.Sprintf(`
                 ____          
@@ -15,10 +16,18 @@ var banner = fmt.Sprintf(`
    / /_/ / /_/ / /_/ / / / / /
   / .___/\__,_/\__/_/ /_/ /_/ 
  /_/                          %s
-`, Version)
+`, version)
 
 // showBanner is used to show the banner to the user
 func showBanner() {
 	gologger.Print().Msgf("%s\n", banner)
 	gologger.Print().Msgf("\t\tprojectdiscovery.io\n\n")
+}
+
+// GetUpdateCallback returns a callback function that updates pdtm
+func GetUpdateCallback() func() {
+	return func() {
+		showBanner()
+		updateutils.GetUpdateToolCallback("pdtm", version)()
+	}
 }

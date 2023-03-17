@@ -13,6 +13,8 @@ import (
 	"github.com/projectdiscovery/pdtm/pkg/path"
 	fileutil "github.com/projectdiscovery/utils/file"
 	folderutil "github.com/projectdiscovery/utils/folder"
+	updateutils "github.com/projectdiscovery/utils/update"
+
 )
 
 var defaultConfigLocation = filepath.Join(folderutil.HomeDirOrDefault("."), ".config/pdtm/config.yaml")
@@ -35,10 +37,11 @@ type Options struct {
 	UpdateAll  bool
 	RemoveAll  bool
 
-	Verbose  bool
-	Silent   bool
-	Version  bool
-	ShowPath bool
+	Verbose            bool
+	Silent             bool
+	Version            bool
+	ShowPath           bool
+	DisableUpdateCheck bool
 }
 
 // ParseOptions parses the command line flags provided by a user
@@ -68,6 +71,8 @@ func ParseOptions() *Options {
 	flagSet.CreateGroup("update", "Update",
 		flagSet.StringSliceVarP(&options.Update, "update", "u", nil, "update single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.BoolVarP(&options.UpdateAll, "update-all", "ua", false, "update all the projects"),
+		flagSet.CallbackVarP(GetUpdateCallback(), "self-update", "up", "update pdtm to latest version"),
+		flagSet.BoolVarP(&options.DisableUpdateCheck, "disable-update-check", "duc", false, "disable automatic pdtm update check"),
 	)
 
 	flagSet.CreateGroup("remove", "Remove",
@@ -95,7 +100,7 @@ func ParseOptions() *Options {
 	showBanner()
 
 	if options.Version {
-		gologger.Info().Msgf("Current Version: %s\n", Version)
+		gologger.Info().Msgf("Current Version: %s\n", version)
 		os.Exit(0)
 	}
 
@@ -103,6 +108,17 @@ func ParseOptions() *Options {
 		// prints default path if not modified
 		gologger.Silent().Msg(options.Path)
 		os.Exit(0)
+	}
+
+	if !options.DisableUpdateCheck {
+		latestVersion, err := updateutils.GetVersionCheckCallback("pdtm")()
+		if err != nil {
+			if options.Verbose {
+				gologger.Error().Msgf("pdtm version check failed: %v", err.Error())
+			}
+		} else {
+			gologger.Info().Msgf("Current pdtm version %v %v", version, updateutils.GetVersionDescription(version, latestVersion))
+		}
 	}
 
 	if options.ConfigFile != defaultConfigLocation {
