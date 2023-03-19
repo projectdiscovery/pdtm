@@ -10,7 +10,6 @@ import (
 	"github.com/projectdiscovery/gologger/formatter"
 	"github.com/projectdiscovery/gologger/levels"
 	fileutil "github.com/projectdiscovery/utils/file"
-	folderutil "github.com/projectdiscovery/utils/folder"
 	updateutils "github.com/projectdiscovery/utils/update"
 
 )
