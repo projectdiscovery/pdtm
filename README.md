@@ -72,8 +72,10 @@ INSTALL:
    -ia, -install-all      install all the projects
 
 UPDATE:
-   -u, -update string[]  update single or multiple project by name (comma separated)
-   -ua, -update-all      update all the projects
+   -u, -update string[]         update single or multiple project by name (comma separated)
+   -ua, -update-all             update all the projects
+   -up, -self-update            update pdtm to latest version
+   -duc, -disable-update-check  disable automatic pdtm update check
 
 REMOVE:
    -r, -remove string[]  remove single or multiple project by name (comma separated)
