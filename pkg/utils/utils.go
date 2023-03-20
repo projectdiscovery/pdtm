@@ -3,7 +3,6 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"os/exec"
@@ -96,16 +95,11 @@ func InstalledVersion(tool pkg.Tool, basePath string, au *aurora.Aurora) string 
 	cmd.Stderr = &outb
 	err := cmd.Run()
 	if err != nil {
-		var errNotFound *exec.Error
-		if errors.As(err, &errNotFound) {
-			osAvailable := isOsAvailable(tool)
-			if osAvailable {
-				msg = au.BrightYellow("(not installed)").String()
-			} else {
-				msg = au.Gray(10, "(not supported)").String()
-			}
+		osAvailable := isOsAvailable(tool)
+		if !osAvailable {
+			msg = au.Gray(10, "(not supported)").String()
 		} else {
-			msg = "not found"
+			msg = au.BrightYellow("(not installed)").String()
 		}
 	}
 
