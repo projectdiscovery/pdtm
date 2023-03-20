@@ -103,7 +103,7 @@ func (r *Runner) Run() error {
 				if err == pkg.ErrIsUpToDate {
 					gologger.Info().Msgf("%s: %s", tool, err)
 				} else {
-					gologger.Error().Msgf("error while updating %s: %s", tool, err)
+					gologger.Info().Msgf("%s\n", err)
 				}
 			}
 		}
@@ -119,7 +119,7 @@ func (r *Runner) Run() error {
 				if errors.As(err, &notFoundError) {
 					gologger.Info().Msgf("%s: not found", tool)
 				} else {
-					gologger.Error().Msgf("error while removing %s: %s", tool, err)
+					gologger.Info().Msgf("%s\n", err)
 				}
 			}
 
