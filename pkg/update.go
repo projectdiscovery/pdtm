@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	ospath "github.com/projectdiscovery/pdtm/pkg/path"
+	stringsutil "github.com/projectdiscovery/utils/strings"
 
 	"github.com/projectdiscovery/gologger"
 )
@@ -34,7 +35,7 @@ func Update(path string, tool Tool) error {
 	}
 }
 
-func isUpToDate(tool Tool, path string) (latest bool) {
+func isUpToDate(tool Tool, path string) bool {
 	cmd := exec.Command(filepath.Join(path, tool.Name), "--version")
 
 	var outb bytes.Buffer
@@ -42,18 +43,10 @@ func isUpToDate(tool Tool, path string) (latest bool) {
 	cmd.Stderr = &outb
 	err := cmd.Run()
 	if err != nil {
-		latest = false
-		return
+		return false
 	}
-
-	installedVersion := bytes.Split(outb.Bytes(), []byte("Current Version: "))
-	if len(installedVersion) == 2 {
-		installedVersionString := strings.TrimPrefix(strings.TrimSpace(string(installedVersion[1])), "v")
-		if strings.Contains(tool.Version, installedVersionString) {
-			latest = true
-		} else {
-			latest = false
-		}
-	}
-	return
+	out := strings.ToLower(outb.String())
+	v, err := stringsutil.Between(out, "current version:", "\n")
+	v = strings.Trim(v, "\n v")
+	return err == nil && strings.EqualFold(tool.Version, v)
 }
