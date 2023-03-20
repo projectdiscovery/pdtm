@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/projectdiscovery/goflags"
 	"github.com/projectdiscovery/pdtm/pkg/utils"
@@ -26,7 +28,12 @@ func main() {
 	}
 
 	if !options.DisableUpdateCheck {
-		msg := utils.GetVersionCheckCallback(toolName)()
+		home, err := os.UserHomeDir()
+		if err != nil {
+			panic(err)
+		}
+		basePath := filepath.Join(home, ".pdtm/go/bin")
+		msg := utils.GetVersionCheckCallback(toolName, basePath)()
 		fmt.Println(msg)
 	}
 }

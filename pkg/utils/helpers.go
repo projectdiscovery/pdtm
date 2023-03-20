@@ -10,13 +10,13 @@ import (
 )
 
 // returns a callback function and when it is executed returns a version string of that tool
-func GetVersionCheckCallback(toolName string) func() string {
+func GetVersionCheckCallback(toolName, basePath string) func() string {
 	return func() string {
 		tool, err := fetchTool(toolName)
 		if err != nil {
 			return err.Error()
 		}
-		return fmt.Sprintf("%s %s", toolName, InstalledVersion(tool, au))
+		return fmt.Sprintf("%s %s", toolName, InstalledVersion(tool, basePath, au))
 	}
 }
 

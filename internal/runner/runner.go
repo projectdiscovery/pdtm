@@ -166,7 +166,7 @@ func (r *Runner) ListToolsAndEnv(tools []pkg.Tool) error {
 	gologger.Info().Msgf(fmtMsg, r.options.Path)
 
 	for i, tool := range tools {
-		msg := utils.InstalledVersion(tool, au)
+		msg := utils.InstalledVersion(tool, r.options.Path, au)
 		fmt.Printf("%d. %s %s\n", i, tool.Name, msg)
 	}
 	return nil
