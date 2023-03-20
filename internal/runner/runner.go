@@ -167,7 +167,7 @@ func (r *Runner) ListToolsAndEnv(tools []pkg.Tool) error {
 
 	for i, tool := range tools {
 		msg := utils.InstalledVersion(tool, r.options.Path, au)
-		fmt.Printf("%d. %s %s\n", i, tool.Name, msg)
+		fmt.Printf("%d. %s %s\n", i+1, tool.Name, msg)
 	}
 	return nil
 }
