@@ -105,7 +105,7 @@ func InstalledVersion(tool pkg.Tool, basePath string, au *aurora.Aurora) string 
 				msg = au.Gray(10, "(not supported)").String()
 			}
 		} else {
-			msg = "version not found"
+			msg = "not found"
 		}
 	}
 
