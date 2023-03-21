@@ -24,8 +24,7 @@ var extIfFound = ".exe"
 
 // Install installs given tool at path
 func Install(path string, tool Tool) error {
-	if executablePath, exists := ospath.GetExecutablePath(path, tool.Name); exists {
-		gologger.Info().Msgf("%s is already present in path %s: skipping installation", tool.Name, executablePath)
+	if _, exists := ospath.GetExecutablePath(path, tool.Name); exists {
 		return ErrIsInstalled
 	}
 	gologger.Info().Msgf("installing %s...", tool.Name)

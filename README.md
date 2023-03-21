@@ -45,8 +45,10 @@ go install -v github.com/projectdiscovery/pdtm/cmd/pdtm@latest
 <tr>
 <td>  
 
-> **Note**:
-> *Currently, projects are installed by downloading the released project binary. This means that projects can only be installed on the platforms for which binaries have been published.*
+> **Notes**:
+
+> - *Currently, projects are installed by downloading the released project binary. This means that projects can only be installed on the platforms for which binaries have been published.*
+> - *The path $HOME/.pdtm/go/bin is added to the $PATH variable by default*
 
 </table>
 </tr>
@@ -56,6 +58,8 @@ go install -v github.com/projectdiscovery/pdtm/cmd/pdtm@latest
 
 
 ```console
+pdtm is a simple and easy-to-use golang based tool for managing open source projects from ProjectDiscovery
+
 Usage:
   ./pdtm [flags]
 
@@ -63,19 +67,22 @@ Flags:
 CONFIG:
    -config string            cli flag configuration file (default "$HOME/.config/pdtm/config.yaml")
    -bp, -binary-path string  custom location to download project binary (default "$HOME/.pdtm/go/bin")
-   -nsp, -no-set-path        disable adding path to environment variables
 
 INSTALL:
    -i, -install string[]  install single or multiple project by name (comma separated)
    -ia, -install-all      install all the projects
+   -ip, -install-path     append path to PATH environment variables
 
 UPDATE:
-   -u, -update string[]  update single or multiple project by name (comma separated)
-   -ua, -update-all      update all the projects
+   -u, -update string[]         update single or multiple project by name (comma separated)
+   -ua, -update-all             update all the projects
+   -up, -self-update            update pdtm to latest version
+   -duc, -disable-update-check  disable automatic pdtm update check
 
 REMOVE:
    -r, -remove string[]  remove single or multiple project by name (comma separated)
    -ra, -remove-all      remove all the projects
+   -rp, -remove-path     remove path from PATH environment variables
 
 DEBUG:
    -sp, -show-path  show the current binary path then exit

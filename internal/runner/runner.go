@@ -11,6 +11,7 @@ import (
 	"github.com/projectdiscovery/pdtm/pkg"
 	"github.com/projectdiscovery/pdtm/pkg/path"
 	"github.com/projectdiscovery/pdtm/pkg/utils"
+	errorutil "github.com/projectdiscovery/utils/errors"
 )
 
 // Runner contains the internal logic of the program
@@ -27,6 +28,19 @@ func NewRunner(options *Options) (*Runner, error) {
 
 // Run the instance
 func (r *Runner) Run() error {
+	// add default path to $PATH
+	if r.options.SetPath || r.options.Path == defaultPath {
+		if err := path.SetENV(r.options.Path); err != nil {
+			return errorutil.NewWithErr(err).Msgf(`Failed to set path: %s. Add it to $PATH and run again`, r.options.Path)
+		}
+	}
+
+	if r.options.UnSetPath {
+		if err := path.UnsetENV(r.options.Path); err != nil {
+			return errorutil.NewWithErr(err).Msgf(`Failed to unset path: %s. Remove it from $PATH and run again`, r.options.Path)
+		}
+	}
+
 	toolList, err := utils.FetchToolList()
 
 	// if toolList is not nil save/update the cache
@@ -63,6 +77,10 @@ func (r *Runner) Run() error {
 	gologger.Verbose().Msgf("using path %s", r.options.Path)
 
 	for _, tool := range r.options.Install {
+		if !path.IsSubPath(homeDir, r.options.Path) {
+			gologger.Error().Msgf("skipping install outside home folder: %s", tool)
+			continue
+		}
 		if i, ok := utils.Contains(toolList, tool); ok {
 			if err := pkg.Install(r.options.Path, toolList[i]); err != nil {
 				if err == pkg.ErrIsInstalled {
@@ -76,31 +94,39 @@ func (r *Runner) Run() error {
 		}
 	}
 	for _, tool := range r.options.Update {
+		if !path.IsSubPath(homeDir, r.options.Path) {
+			gologger.Error().Msgf("skipping update outside home folder: %s", tool)
+			continue
+		}
 		if i, ok := utils.Contains(toolList, tool); ok {
 			if err := pkg.Update(r.options.Path, toolList[i]); err != nil {
 				if err == pkg.ErrIsUpToDate {
 					gologger.Info().Msgf("%s: %s", tool, err)
 				} else {
-					gologger.Error().Msgf("error while updating %s: %s", tool, err)
+					gologger.Info().Msgf("%s\n", err)
 				}
 			}
 		}
 	}
 	for _, tool := range r.options.Remove {
+		if !path.IsSubPath(homeDir, r.options.Path) {
+			gologger.Error().Msgf("skipping remove outside home folder: %s", tool)
+			continue
+		}
 		if i, ok := utils.Contains(toolList, tool); ok {
 			if err := pkg.Remove(r.options.Path, toolList[i]); err != nil {
 				var notFoundError *exec.Error
 				if errors.As(err, &notFoundError) {
 					gologger.Info().Msgf("%s: not found", tool)
 				} else {
-					gologger.Error().Msgf("error while removing %s: %s", tool, err)
+					gologger.Info().Msgf("%s\n", err)
 				}
 			}
 
 		}
 	}
 	if len(r.options.Install) == 0 && len(r.options.Update) == 0 && len(r.options.Remove) == 0 {
-		return r.ListTools(toolList)
+		return r.ListToolsAndEnv(toolList)
 	}
 	return nil
 }
@@ -128,18 +154,20 @@ func FetchFromCache() ([]pkg.Tool, error) {
 }
 
 // ListTools prints the list of tools
-func (r *Runner) ListTools(tools []pkg.Tool) error {
-	dirname, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
+func (r *Runner) ListToolsAndEnv(tools []pkg.Tool) error {
 	gologger.Info().Msgf(path.GetOsData() + "\n")
-	gologger.Info().Msgf("Path to download project binary: %s/.pdtm/go/bin\n\n", dirname)
-	var i int
-	for _, tool := range tools {
-		i++
-		msg := utils.InstalledVersion(tool, au)
-		fmt.Printf("%d. %s %s\n", i, tool.Name, msg)
+	gologger.Info().Msgf("Path to download project binary: %s\n", r.options.Path)
+	var fmtMsg string
+	if path.IsSet(r.options.Path) {
+		fmtMsg = "Path %s configured in environment variable $PATH\n"
+	} else {
+		fmtMsg = "Path %s not configured in environment variable $PATH\n"
+	}
+	gologger.Info().Msgf(fmtMsg, r.options.Path)
+
+	for i, tool := range tools {
+		msg := utils.InstalledVersion(tool, r.options.Path, au)
+		fmt.Printf("%d. %s %s\n", i+1, tool.Name, msg)
 	}
 	return nil
 }
