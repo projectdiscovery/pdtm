@@ -2,6 +2,9 @@ name: 🔨 Setup Test
 
 on:
   pull_request:
+    paths:
+      - '**.go'
+      - '**.mod'
   workflow_dispatch:
 
 env:

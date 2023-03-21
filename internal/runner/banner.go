@@ -1,22 +1,20 @@
 package runner
 
 import (
-	"fmt"
-
 	"github.com/projectdiscovery/gologger"
-    updateutils "github.com/projectdiscovery/utils/update"
+	updateutils "github.com/projectdiscovery/utils/update"
 )
 
-const version = "v0.0.4"
+const version = "v0.0.5"
 
-var banner = fmt.Sprintf(`
+var banner = (`
                 ____          
      ____  ____/ / /_____ ___ 
     / __ \/ __  / __/ __ __  \
    / /_/ / /_/ / /_/ / / / / /
   / .___/\__,_/\__/_/ /_/ /_/ 
- /_/                          %s
-`, version)
+ /_/                         
+`)
 
 // showBanner is used to show the banner to the user
 func showBanner() {
