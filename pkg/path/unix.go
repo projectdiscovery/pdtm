@@ -49,6 +49,14 @@ func lookupConfFromShell() (*Config, error) {
 			return conf, nil
 		}
 	}
+	// assume bash as default shell if variable is empty in unix distros
+	if shell == "." && len(confList) > 1 {
+		conf := confList[0]
+		if _, err := conf.GetRCFilePath(); err != nil {
+			return nil, err
+		}
+		return conf, nil
+	}
 	return nil, errors.New("shell not supported")
 }
 
