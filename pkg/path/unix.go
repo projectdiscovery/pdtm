@@ -35,8 +35,11 @@ func (c *Config) GetRCFilePath() (string, error) {
 	if fileutil.FileExists(rcFilePath) {
 		return rcFilePath, nil
 	}
-
-	return "", fmt.Errorf(`rcfile "%s" not found`, rcFilePath)
+	// if file doesn't exist create empty file
+	if err := os.WriteFile(rcFilePath, []byte("#\n"), 0644); err != nil {
+		return "", fmt.Errorf("failed to create rcFile %v got %v", rcFilePath, err)
+	}
+	return rcFilePath, nil
 }
 
 func lookupConfFromShell() (*Config, error) {
