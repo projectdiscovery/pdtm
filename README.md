@@ -58,18 +58,20 @@ go install -v github.com/projectdiscovery/pdtm/cmd/pdtm@latest
 
 
 ```console
+pdtm is a simple and easy-to-use golang based tool for managing open source projects from ProjectDiscovery
+
 Usage:
   ./pdtm [flags]
 
 Flags:
 CONFIG:
-   -config string            cli flag configuration file (default "$HOME/.config/pdtm/config.yaml")
-   -bp, -binary-path string  custom location to download project binary (default "$HOME/.pdtm/go/bin")
-   -nsp, -no-set-path        disable adding path to environment variables
+   -config string            cli flag configuration file (default "/Users/tarun/.config/pdtm/config.yaml")
+   -bp, -binary-path string  custom location to download project binary (default "/Users/tarun/.pdtm/go/bin")
 
 INSTALL:
    -i, -install string[]  install single or multiple project by name (comma separated)
    -ia, -install-all      install all the projects
+   -ip, -install-path     append path to PATH environment variables
 
 UPDATE:
    -u, -update string[]         update single or multiple project by name (comma separated)
@@ -80,6 +82,7 @@ UPDATE:
 REMOVE:
    -r, -remove string[]  remove single or multiple project by name (comma separated)
    -ra, -remove-all      remove all the projects
+   -rp, -remove-path     remove path from PATH environment variables
 
 DEBUG:
    -sp, -show-path  show the current binary path then exit
