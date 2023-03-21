@@ -37,13 +37,13 @@ jobs:
 
       - name: Add binaries folder to ENV PATH (Unix-Like)
         if: runner.os != 'Windows'
-        run: go run . -show-path -nsp >> $GITHUB_PATH
+        run: go run . -show-path >> $GITHUB_PATH
         working-directory: cmd/pdtm/
 
       - name: Add binaries folder to ENV PATH (Windows)
         if: runner.os == 'Windows'
         run: |
-          go run . -show-path -nsp | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          go run . -show-path | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         working-directory: cmd/pdtm/
 
       - name: Checking tools existence

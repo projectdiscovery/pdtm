@@ -3,10 +3,10 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -84,26 +84,22 @@ func Contains(s []pkg.Tool, toolName string) (int, bool) {
 	return -1, false
 }
 
-func InstalledVersion(tool pkg.Tool, au *aurora.Aurora) string {
+func InstalledVersion(tool pkg.Tool, basePath string, au *aurora.Aurora) string {
 	var msg string
 
-	cmd := exec.Command(tool.Name, "--version")
+	toolPath := filepath.Join(basePath, tool.Name)
+	cmd := exec.Command(toolPath, "--version")
 
 	var outb bytes.Buffer
 	cmd.Stdout = &outb
 	cmd.Stderr = &outb
 	err := cmd.Run()
 	if err != nil {
-		var notFoundError *exec.Error
-		if errors.As(err, &notFoundError) {
-			osAvailable := isOsAvailable(tool)
-			if osAvailable {
-				msg = au.BrightYellow("(not installed)").String()
-			} else {
-				msg = au.Gray(10, "(not supported)").String()
-			}
+		osAvailable := isOsAvailable(tool)
+		if !osAvailable {
+			msg = au.Gray(10, "(not supported)").String()
 		} else {
-			msg = "version not found"
+			msg = au.BrightYellow("(not installed)").String()
 		}
 	}
 

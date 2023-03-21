@@ -13,10 +13,20 @@ type Config struct {
 	rcFile    string
 }
 
+func IsSet(path string) bool {
+	ok, _ := isSet(path)
+	return ok
+}
+
 var CommonExtensions = []string{"", ".exe", ".bat"}
 
 func SetENV(path string) error {
 	_, err := add(path)
+	return err
+}
+
+func UnsetENV(path string) error {
+	_, err := remove(path)
 	return err
 }
 

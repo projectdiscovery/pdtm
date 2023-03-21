@@ -1,5 +1,4 @@
 //go:build windows
-// +build windows
 
 // from https://github.com/therootcompany/pathman with some minor changes
 package path
@@ -17,11 +16,12 @@ import (
 	"strings"
 
 	"github.com/projectdiscovery/gologger"
+	sliceutil "github.com/projectdiscovery/utils/slice"
 	"golang.org/x/sys/windows/registry"
 )
 
 func add(p string) (bool, error) {
-	cur, err := paths()
+	cur, err := getPathsFromRegistry()
 	if nil != err {
 		return false, err
 	}
@@ -36,6 +36,30 @@ func add(p string) (bool, error) {
 	}
 
 	cur = append(cur, p)
+	err = write(p, cur)
+	if nil != err {
+		return false, err
+	}
+	return true, nil
+}
+
+func remove(p string) (bool, error) {
+	cur, err := getPathsFromRegistry()
+	if nil != err {
+		return false, err
+	}
+
+	index, err := IndexOf(cur, p)
+	if err != nil {
+		return false, err
+	}
+	// skip silently, successfully
+	if index == -1 {
+		return false, nil
+	}
+
+	cur = sliceutil.PruneEqual(cur, p)
+
 	err = write(p, cur)
 	if nil != err {
 		return false, err
@@ -70,7 +94,12 @@ func write(path string, cur []string) error {
 	return nil
 }
 
-func paths() ([]string, error) {
+func paths() []string {
+	configuredPaths, _ := getPathsFromRegistry()
+	return configuredPaths
+}
+
+func getPathsFromRegistry() ([]string, error) {
 	k, err := registry.OpenKey(registry.CURRENT_USER, `Environment`, registry.QUERY_VALUE)
 	if err != nil {
 		return nil, fmt.Errorf("Can't open HKCU Environment for reads: %s", err)
@@ -84,4 +113,17 @@ func paths() ([]string, error) {
 		return nil, fmt.Errorf("Can't query HKCU Environment[Path]: %s", err)
 	}
 	return strings.Split(s, string(os.PathListSeparator)), nil
+}
+
+func isSet(path string) (bool, error) {
+	cur, err := getPathsFromRegistry()
+	if nil != err {
+		return false, err
+	}
+
+	index, err := IndexOf(cur, path)
+	if err != nil {
+		return false, err
+	}
+	return index >= 0, nil
 }

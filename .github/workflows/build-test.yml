@@ -31,7 +31,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         
       - name: Race Condition Tests
-        run: go build -race .
+        run: go run -race .
         working-directory: cmd/pdtm/
       
       - name: Test Example Code
