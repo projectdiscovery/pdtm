@@ -65,8 +65,8 @@ Usage:
 
 Flags:
 CONFIG:
-   -config string            cli flag configuration file (default "/Users/tarun/.config/pdtm/config.yaml")
-   -bp, -binary-path string  custom location to download project binary (default "/Users/tarun/.pdtm/go/bin")
+   -config string            cli flag configuration file (default "$HOME/.config/pdtm/config.yaml")
+   -bp, -binary-path string  custom location to download project binary (default "$HOME/.pdtm/go/bin")
 
 INSTALL:
    -i, -install string[]  install single or multiple project by name (comma separated)
