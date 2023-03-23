@@ -28,7 +28,7 @@ func Update(path string, tool Tool) error {
 		if err != nil {
 			return err
 		}
-		gologger.Info().Msgf("updated %s to %s(latest)", tool.Name, version)
+		gologger.Info().Msgf("updated %s to %s (%s)", tool.Name, version, au.Green("latest").String())
 		return nil
 	} else {
 		return fmt.Errorf(ErrToolNotFound, tool.Name, executablePath)
