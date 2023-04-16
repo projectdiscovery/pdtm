@@ -16,11 +16,15 @@ import (
 	"strings"
 
 	"github.com/google/go-github/github"
+	"github.com/logrusorgru/aurora/v4"
 	"github.com/projectdiscovery/gologger"
 	ospath "github.com/projectdiscovery/pdtm/pkg/path"
 )
 
-var extIfFound = ".exe"
+var (
+	extIfFound = ".exe"
+	au         = aurora.New(aurora.WithColors(true))
+)
 
 // Install installs given tool at path
 func Install(path string, tool Tool) error {
@@ -32,7 +36,7 @@ func Install(path string, tool Tool) error {
 	if err != nil {
 		return err
 	}
-	gologger.Info().Msgf("installed %s %s(latest)", tool.Name, version)
+	gologger.Info().Msgf("installed %s %s (%s)", tool.Name, version, au.Green("latest").String())
 	return nil
 }
 

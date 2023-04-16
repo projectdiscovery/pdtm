@@ -12,7 +12,10 @@ import (
 	"github.com/projectdiscovery/pdtm/pkg/path"
 	"github.com/projectdiscovery/pdtm/pkg/utils"
 	errorutil "github.com/projectdiscovery/utils/errors"
+	stringsutil "github.com/projectdiscovery/utils/strings"
 )
+
+var blacklistTool = []string{"nuclei-templates"}
 
 // Runner contains the internal logic of the program
 type Runner struct {
@@ -41,7 +44,14 @@ func (r *Runner) Run() error {
 		}
 	}
 
-	toolList, err := utils.FetchToolList()
+	toolListApi, err := utils.FetchToolList()
+	var toolList []pkg.Tool
+
+	for _, tool := range toolListApi {
+		if !stringsutil.ContainsAny(tool.Name, blacklistTool...) {
+			toolList = append(toolList, tool)
+		}
+	}
 
 	// if toolList is not nil save/update the cache
 	// else fetch from cache file

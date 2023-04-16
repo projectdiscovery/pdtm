@@ -11,7 +11,6 @@ import (
 	"github.com/projectdiscovery/gologger/levels"
 	fileutil "github.com/projectdiscovery/utils/file"
 	updateutils "github.com/projectdiscovery/utils/update"
-
 )
 
 var (

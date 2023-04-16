@@ -1,8 +1,8 @@
-FROM golang:1.20.2-alpine AS builder
+FROM golang:1.20.3-alpine AS builder
 RUN apk add --no-cache git
 RUN go install -v github.com/projectdiscovery/pdtm/cmd/pdtm@latest
 
-FROM alpine:3.17.2
+FROM alpine:3.17.3
 RUN apk -U upgrade --no-cache \
     && apk add --no-cache bind-tools ca-certificates
 COPY --from=builder /go/bin/pdtm /usr/local/bin/
