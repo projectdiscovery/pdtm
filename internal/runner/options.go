@@ -114,7 +114,7 @@ func ParseOptions() *Options {
 	}
 
 	if !options.DisableUpdateCheck {
-		latestVersion, err := updateutils.GetVersionCheckCallback("pdtm")()
+		latestVersion, err := updateutils.GetToolVersionCallback("pdtm", version)()
 		if err != nil {
 			if options.Verbose {
 				gologger.Error().Msgf("pdtm version check failed: %v", err.Error())
