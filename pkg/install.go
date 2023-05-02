@@ -36,7 +36,7 @@ func Install(path string, tool Tool) error {
 	if err != nil {
 		return err
 	}
-	gologger.Info().Msgf("installed %s %s (%s)", tool.Name, version, au.Green("latest").String())
+	gologger.Info().Msgf("installed %s %s (%s)", tool.Name, version, au.BrightGreen("latest").String())
 	return nil
 }
 
