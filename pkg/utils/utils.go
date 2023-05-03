@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os/exec"
@@ -97,9 +98,9 @@ func InstalledVersion(tool pkg.Tool, basePath string, au *aurora.Aurora) string 
 	if err != nil {
 		osAvailable := isOsAvailable(tool)
 		if !osAvailable {
-			msg = "(" + au.Gray(10, "not supported").String() + ")"
+			msg = fmt.Sprintf("(%s)", au.Gray(10, "not supported").String())
 		} else {
-			msg = "(" + au.BrightYellow("not installed").String() + ")"
+			msg = fmt.Sprintf("(%s)", au.BrightYellow("not installed").String())
 		}
 	}
 
@@ -107,11 +108,12 @@ func InstalledVersion(tool pkg.Tool, basePath string, au *aurora.Aurora) string 
 	if len(installedVersion) == 2 {
 		installedVersionString := strings.TrimPrefix(strings.TrimSpace(string(installedVersion[1])), "v")
 		if strings.Contains(tool.Version, installedVersionString) {
-			msg = "(" + au.BrightGreen("latest").String() + ") (" + au.BrightGreen(tool.Version).String() + ")"
+			msg = fmt.Sprintf("(%s) (%s)", au.BrightGreen("latest").String(), au.BrightGreen(tool.Version).String())
 		} else {
-			msg = "(" + au.Red("outdated").String() + ") (" +
-				au.Red(installedVersionString).String() + ")" +
-				" ➡ (" + au.BrightGreen(tool.Version).String() + ")"
+			msg = fmt.Sprintf("(%s) (%s) ➡ (%s)",
+				au.Red("outdated").String(),
+				au.Red(installedVersionString).String(),
+				au.BrightGreen(tool.Version).String())
 		}
 	}
 	return msg
