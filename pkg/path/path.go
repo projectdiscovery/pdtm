@@ -1,6 +1,7 @@
 package path
 
 import (
+	osutils "github.com/projectdiscovery/utils/os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -61,7 +62,7 @@ func GetExecutablePath(path, toolName string) (string, bool) {
 		}
 	}
 
-	if runtime.GOOS == "windows" {
+	if osutils.IsWindows() {
 		return basePath + ".exe", false
 	}
 

@@ -1,6 +1,6 @@
 //go:build windows
 
-// from https://github.com/therootcompany/pathman with some minor changes
+// path from https://github.com/therootcompany/pathman with some minor changes
 package path
 
 // Needs to
@@ -70,13 +70,13 @@ func remove(p string) (bool, error) {
 func write(path string, cur []string) error {
 	k, err := registry.OpenKey(registry.CURRENT_USER, `Environment`, registry.SET_VALUE)
 	if err != nil {
-		return fmt.Errorf("Can't open HKCU Environment for writes: %s", err)
+		return fmt.Errorf("can't open HKCU Environment for writes: %s", err)
 	}
 	defer k.Close()
 
 	err = k.SetStringValue(`Path`, strings.Join(cur, string(os.PathListSeparator)))
 	if nil != err {
-		return fmt.Errorf("Can't set HKCU Environment[Path]: %s", err)
+		return fmt.Errorf("can't set HKCU Environment[Path]: %s", err)
 	}
 	err = k.Close()
 	if nil != err {
@@ -102,7 +102,7 @@ func paths() []string {
 func getPathsFromRegistry() ([]string, error) {
 	k, err := registry.OpenKey(registry.CURRENT_USER, `Environment`, registry.QUERY_VALUE)
 	if err != nil {
-		return nil, fmt.Errorf("Can't open HKCU Environment for reads: %s", err)
+		return nil, fmt.Errorf("can't open HKCU Environment for reads: %s", err)
 	}
 	defer k.Close()
 	s, _, err := k.GetStringValue("Path")
@@ -110,7 +110,7 @@ func getPathsFromRegistry() ([]string, error) {
 		if strings.Contains(err.Error(), "cannot find the file") {
 			return []string{}, nil
 		}
-		return nil, fmt.Errorf("Can't query HKCU Environment[Path]: %s", err)
+		return nil, fmt.Errorf("can't query HKCU Environment[Path]: %s", err)
 	}
 	return strings.Split(s, string(os.PathListSeparator)), nil
 }

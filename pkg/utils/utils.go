@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 
@@ -85,6 +86,8 @@ func Contains(s []pkg.Tool, toolName string) (int, bool) {
 	return -1, false
 }
 
+var regexVersionNumber = regexp.MustCompile(`(?m)[v\s](\d+\.\d+\.\d+)`)
+
 func InstalledVersion(tool pkg.Tool, basePath string, au *aurora.Aurora) string {
 	var msg string
 
@@ -104,9 +107,8 @@ func InstalledVersion(tool pkg.Tool, basePath string, au *aurora.Aurora) string 
 		}
 	}
 
-	installedVersion := strings.Split(strings.ToLower(outb.String()), "current version: ")
-	if len(installedVersion) == 2 {
-		installedVersionString := strings.TrimPrefix(strings.TrimSpace(string(installedVersion[1])), "v")
+	if installedVersion := regexVersionNumber.FindString(strings.ToLower(outb.String())); installedVersion != "" {
+		installedVersionString := strings.TrimPrefix(strings.TrimSpace(installedVersion), "v")
 		if strings.Contains(tool.Version, installedVersionString) {
 			msg = fmt.Sprintf("(%s) (%s)", au.BrightGreen("latest").String(), au.BrightGreen(tool.Version).String())
 		} else {
@@ -116,6 +118,7 @@ func InstalledVersion(tool pkg.Tool, basePath string, au *aurora.Aurora) string 
 				au.BrightGreen(tool.Version).String())
 		}
 	}
+
 	return msg
 }
 

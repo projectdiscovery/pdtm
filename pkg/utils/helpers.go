@@ -9,7 +9,7 @@ import (
 	"github.com/projectdiscovery/pdtm/pkg"
 )
 
-// returns a callback function and when it is executed returns a version string of that tool
+// GetVersionCheckCallback returns a callback function and when it is executed returns a version string of that tool
 func GetVersionCheckCallback(toolName, basePath string) func() string {
 	return func() string {
 		tool, err := fetchTool(toolName)
@@ -20,7 +20,7 @@ func GetVersionCheckCallback(toolName, basePath string) func() string {
 	}
 }
 
-// returns a callback function when executed  updates that tool
+// GetUpdaterCallback returns a callback function when executed  updates that tool
 func GetUpdaterCallback(toolName string) func() {
 	return func() {
 		home, _ := os.UserHomeDir()

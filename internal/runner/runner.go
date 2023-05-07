@@ -56,7 +56,11 @@ func (r *Runner) Run() error {
 	// if toolList is not nil save/update the cache
 	// else fetch from cache file
 	if toolList != nil {
-		go UpdateCache(toolList) //nolint:errcheck
+		go func() {
+			if err := UpdateCache(toolList); err != nil {
+				gologger.Warning().Msgf("%s\n", err)
+			}
+		}()
 	} else {
 		toolList, err = FetchFromCache()
 		if err != nil {
@@ -163,7 +167,7 @@ func FetchFromCache() ([]pkg.Tool, error) {
 	return toolList, nil
 }
 
-// ListTools prints the list of tools
+// ListToolsAndEnv prints the list of tools
 func (r *Runner) ListToolsAndEnv(tools []pkg.Tool) error {
 	gologger.Info().Msgf(path.GetOsData() + "\n")
 	gologger.Info().Msgf("Path to download project binary: %s\n", r.options.Path)
