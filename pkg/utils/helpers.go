@@ -7,6 +7,7 @@ import (
 
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/pdtm/pkg"
+	"github.com/projectdiscovery/pdtm/pkg/types"
 )
 
 // GetVersionCheckCallback returns a callback function and when it is executed returns a version string of that tool
@@ -30,7 +31,7 @@ func GetUpdaterCallback(toolName string) func() {
 			gologger.Error().Msg(err.Error())
 		}
 		err = pkg.Update(dp, tool)
-		if err == pkg.ErrIsUpToDate {
+		if err == types.ErrIsUpToDate {
 			gologger.Info().Msgf("%s: %s", toolName, err)
 		} else {
 			gologger.Error().Msgf("error while updating %s: %s", toolName, err)

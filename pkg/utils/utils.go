@@ -1,20 +1,17 @@
 package utils
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"os/exec"
-	"path/filepath"
-	"regexp"
 	"runtime"
 	"strings"
 
 	"github.com/logrusorgru/aurora/v4"
-	"github.com/projectdiscovery/pdtm/pkg"
 	"github.com/projectdiscovery/pdtm/pkg/path"
+	"github.com/projectdiscovery/pdtm/pkg/types"
+	"github.com/projectdiscovery/pdtm/pkg/version"
 )
 
 const host = "https://api.pdtm.sh"
@@ -22,8 +19,8 @@ const host = "https://api.pdtm.sh"
 // configure aurora for logging
 var au = aurora.New(aurora.WithColors(true))
 
-func FetchToolList() ([]pkg.Tool, error) {
-	tools := make([]pkg.Tool, 0)
+func FetchToolList() ([]types.Tool, error) {
+	tools := make([]types.Tool, 0)
 
 	// Get current OS name, architecture, and Go version
 	osName := runtime.GOOS
@@ -53,8 +50,8 @@ func FetchToolList() ([]pkg.Tool, error) {
 	return nil, nil
 }
 
-func fetchTool(toolName string) (pkg.Tool, error) {
-	var tool pkg.Tool
+func fetchTool(toolName string) (types.Tool, error) {
+	var tool types.Tool
 	// Create the request URL to get tool
 	reqURL := host + "/api/v1/tools/" + toolName
 	resp, err := http.Get(reqURL)
@@ -77,7 +74,7 @@ func fetchTool(toolName string) (pkg.Tool, error) {
 	return tool, nil
 }
 
-func Contains(s []pkg.Tool, toolName string) (int, bool) {
+func Contains(s []types.Tool, toolName string) (int, bool) {
 	for i, a := range s {
 		if strings.EqualFold(a.Name, toolName) {
 			return i, true
@@ -86,18 +83,10 @@ func Contains(s []pkg.Tool, toolName string) (int, bool) {
 	return -1, false
 }
 
-var regexVersionNumber = regexp.MustCompile(`(?m)[v\s](\d+\.\d+\.\d+)`)
-
-func InstalledVersion(tool pkg.Tool, basePath string, au *aurora.Aurora) string {
+func InstalledVersion(tool types.Tool, basePath string, au *aurora.Aurora) string {
 	var msg string
 
-	toolPath := filepath.Join(basePath, tool.Name)
-	cmd := exec.Command(toolPath, "--version")
-
-	var outb bytes.Buffer
-	cmd.Stdout = &outb
-	cmd.Stderr = &outb
-	err := cmd.Run()
+	installedVersion, err := version.ExtractInstalledVersion(tool, basePath)
 	if err != nil {
 		osAvailable := isOsAvailable(tool)
 		if !osAvailable {
@@ -107,14 +96,13 @@ func InstalledVersion(tool pkg.Tool, basePath string, au *aurora.Aurora) string 
 		}
 	}
 
-	if installedVersion := regexVersionNumber.FindString(strings.ToLower(outb.String())); installedVersion != "" {
-		installedVersionString := strings.TrimPrefix(strings.TrimSpace(installedVersion), "v")
-		if strings.Contains(tool.Version, installedVersionString) {
+	if installedVersion != "" {
+		if strings.Contains(tool.Version, installedVersion) {
 			msg = fmt.Sprintf("(%s) (%s)", au.BrightGreen("latest").String(), au.BrightGreen(tool.Version).String())
 		} else {
 			msg = fmt.Sprintf("(%s) (%s) ➡ (%s)",
 				au.Red("outdated").String(),
-				au.Red(installedVersionString).String(),
+				au.Red(installedVersion).String(),
 				au.BrightGreen(tool.Version).String())
 		}
 	}
@@ -122,7 +110,7 @@ func InstalledVersion(tool pkg.Tool, basePath string, au *aurora.Aurora) string 
 	return msg
 }
 
-func isOsAvailable(tool pkg.Tool) bool {
+func isOsAvailable(tool types.Tool) bool {
 	osData := path.CheckOS()
 	for asset := range tool.Assets {
 		expectedAssetPrefix := tool.Name + "_" + tool.Version + "_" + osData

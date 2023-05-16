@@ -1,8 +1,6 @@
-package pkg
+package types
 
-import (
-	"errors"
-)
+import "errors"
 
 const Organization = "projectdiscovery"
 

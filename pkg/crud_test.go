@@ -4,11 +4,12 @@ import (
 	"os"
 	"testing"
 
+	"github.com/projectdiscovery/pdtm/pkg/types"
 	"github.com/stretchr/testify/assert"
 )
 
-func GetToolStruct() Tool {
-	tool := Tool{
+func GetToolStruct() types.Tool {
+	tool := types.Tool{
 		Name:    "dnsx",
 		Repo:    "dnsx",
 		Version: "1.1.1",
