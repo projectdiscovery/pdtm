@@ -32,7 +32,7 @@ func FetchToolList() ([]types.Tool, error) {
 	tools := make([]types.Tool, 0)
 
 	// Create the request URL with query parameters
-	reqURL := host + "/api/v1/tools?os=" + osName + "&arch=" + osArch + "&go_version=" + goVersion
+	reqURL := fmt.Sprintf("%s/api/v1/tools/?os=%s&arch=%s&go_version=%s", host, osName, osArch, goVersion)
 
 	resp, err := http.Get(reqURL)
 	if err != nil {
@@ -57,7 +57,8 @@ func FetchToolList() ([]types.Tool, error) {
 func fetchTool(toolName string) (types.Tool, error) {
 	var tool types.Tool
 	// Create the request URL to get tool
-	reqURL := host + "/api/v1/tools/" + toolName + "?os=" + osName + "&arch=" + osArch + "&go_version=" + goVersion
+	reqURL := fmt.Sprintf("%s/api/v1/tools/%s?os=%s&arch=%s&go_version=%s", host, toolName, osName, osArch, goVersion)
+	fmt.Println(reqURL)
 	resp, err := http.Get(reqURL)
 	if err != nil {
 		return tool, err
