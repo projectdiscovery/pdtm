@@ -1,10 +1,11 @@
 package path
 
 import (
-	osutils "github.com/projectdiscovery/utils/os"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	osutils "github.com/projectdiscovery/utils/os"
 
 	fileutil "github.com/projectdiscovery/utils/file"
 )

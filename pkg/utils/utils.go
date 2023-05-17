@@ -14,18 +14,22 @@ import (
 	"github.com/projectdiscovery/pdtm/pkg/version"
 )
 
-const host = "https://api.pdtm.sh"
+const (
+	host = "https://api.pdtm.sh"
+)
+
+var (
+	// Get current OS name, architecture, and Go version
+	osName    = runtime.GOOS
+	osArch    = runtime.GOARCH
+	goVersion = runtime.Version()
+)
 
 // configure aurora for logging
 var au = aurora.New(aurora.WithColors(true))
 
 func FetchToolList() ([]types.Tool, error) {
 	tools := make([]types.Tool, 0)
-
-	// Get current OS name, architecture, and Go version
-	osName := runtime.GOOS
-	osArch := runtime.GOARCH
-	goVersion := runtime.Version()
 
 	// Create the request URL with query parameters
 	reqURL := host + "/api/v1/tools?os=" + osName + "&arch=" + osArch + "&go_version=" + goVersion
@@ -53,7 +57,7 @@ func FetchToolList() ([]types.Tool, error) {
 func fetchTool(toolName string) (types.Tool, error) {
 	var tool types.Tool
 	// Create the request URL to get tool
-	reqURL := host + "/api/v1/tools/" + toolName
+	reqURL := host + "/api/v1/tools/" + toolName + "?os=" + osName + "&arch=" + osArch + "&go_version=" + goVersion
 	resp, err := http.Get(reqURL)
 	if err != nil {
 		return tool, err
@@ -65,6 +69,22 @@ func fetchTool(toolName string) (types.Tool, error) {
 		if err != nil {
 			return tool, err
 		}
+		// edge case for nuclei coz, the nuclei api send a list of tools including nuclei-templates
+		if toolName == "nuclei" {
+			var data types.NucleiData
+			err = json.Unmarshal(body, &data)
+			if err != nil {
+				return tool, err
+			}
+			for _, v := range data.Tools {
+				if v.Name == toolName {
+					tool = v
+					break
+				}
+			}
+			return tool, nil
+		}
+
 		err = json.Unmarshal(body, &tool)
 		if err != nil {
 			return tool, err

@@ -18,3 +18,8 @@ type Tool struct {
 	Version string            `json:"version"`
 	Assets  map[string]string `json:"assets"`
 }
+
+type NucleiData struct {
+	IgnoreHash string `json:"ignore-hash"`
+	Tools      []Tool `json:"tools"`
+}
