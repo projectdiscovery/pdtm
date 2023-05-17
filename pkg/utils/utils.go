@@ -58,7 +58,6 @@ func fetchTool(toolName string) (types.Tool, error) {
 	var tool types.Tool
 	// Create the request URL to get tool
 	reqURL := fmt.Sprintf("%s/api/v1/tools/%s?os=%s&arch=%s&go_version=%s", host, toolName, osName, osArch, goVersion)
-	fmt.Println(reqURL)
 	resp, err := http.Get(reqURL)
 	if err != nil {
 		return tool, err
