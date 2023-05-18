@@ -1,36 +1,38 @@
 package utils
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"os/exec"
-	"path/filepath"
 	"runtime"
 	"strings"
 
 	"github.com/logrusorgru/aurora/v4"
-	"github.com/projectdiscovery/pdtm/pkg"
 	"github.com/projectdiscovery/pdtm/pkg/path"
+	"github.com/projectdiscovery/pdtm/pkg/types"
+	"github.com/projectdiscovery/pdtm/pkg/version"
 )
 
-const host = "https://api.pdtm.sh"
+const (
+	host = "https://api.pdtm.sh"
+)
+
+var (
+	// Get current OS name, architecture, and Go version
+	osName    = runtime.GOOS
+	osArch    = runtime.GOARCH
+	goVersion = runtime.Version()
+)
 
 // configure aurora for logging
 var au = aurora.New(aurora.WithColors(true))
 
-func FetchToolList() ([]pkg.Tool, error) {
-	tools := make([]pkg.Tool, 0)
-
-	// Get current OS name, architecture, and Go version
-	osName := runtime.GOOS
-	osArch := runtime.GOARCH
-	goVersion := runtime.Version()
+func FetchToolList() ([]types.Tool, error) {
+	tools := make([]types.Tool, 0)
 
 	// Create the request URL with query parameters
-	reqURL := host + "/api/v1/tools?os=" + osName + "&arch=" + osArch + "&go_version=" + goVersion
+	reqURL := fmt.Sprintf("%s/api/v1/tools/?os=%s&arch=%s&go_version=%s", host, osName, osArch, goVersion)
 
 	resp, err := http.Get(reqURL)
 	if err != nil {
@@ -52,10 +54,10 @@ func FetchToolList() ([]pkg.Tool, error) {
 	return nil, nil
 }
 
-func fetchTool(toolName string) (pkg.Tool, error) {
-	var tool pkg.Tool
+func fetchTool(toolName string) (types.Tool, error) {
+	var tool types.Tool
 	// Create the request URL to get tool
-	reqURL := host + "/api/v1/tools/" + toolName
+	reqURL := fmt.Sprintf("%s/api/v1/tools/%s?os=%s&arch=%s&go_version=%s", host, toolName, osName, osArch, goVersion)
 	resp, err := http.Get(reqURL)
 	if err != nil {
 		return tool, err
@@ -67,6 +69,22 @@ func fetchTool(toolName string) (pkg.Tool, error) {
 		if err != nil {
 			return tool, err
 		}
+		// edge case for nuclei coz, the nuclei api send a list of tools including nuclei-templates
+		if toolName == "nuclei" {
+			var data types.NucleiData
+			err = json.Unmarshal(body, &data)
+			if err != nil {
+				return tool, err
+			}
+			for _, v := range data.Tools {
+				if v.Name == toolName {
+					tool = v
+					break
+				}
+			}
+			return tool, nil
+		}
+
 		err = json.Unmarshal(body, &tool)
 		if err != nil {
 			return tool, err
@@ -76,7 +94,7 @@ func fetchTool(toolName string) (pkg.Tool, error) {
 	return tool, nil
 }
 
-func Contains(s []pkg.Tool, toolName string) (int, bool) {
+func Contains(s []types.Tool, toolName string) (int, bool) {
 	for i, a := range s {
 		if strings.EqualFold(a.Name, toolName) {
 			return i, true
@@ -85,16 +103,10 @@ func Contains(s []pkg.Tool, toolName string) (int, bool) {
 	return -1, false
 }
 
-func InstalledVersion(tool pkg.Tool, basePath string, au *aurora.Aurora) string {
+func InstalledVersion(tool types.Tool, basePath string, au *aurora.Aurora) string {
 	var msg string
 
-	toolPath := filepath.Join(basePath, tool.Name)
-	cmd := exec.Command(toolPath, "--version")
-
-	var outb bytes.Buffer
-	cmd.Stdout = &outb
-	cmd.Stderr = &outb
-	err := cmd.Run()
+	installedVersion, err := version.ExtractInstalledVersion(tool, basePath)
 	if err != nil {
 		osAvailable := isOsAvailable(tool)
 		if !osAvailable {
@@ -104,22 +116,21 @@ func InstalledVersion(tool pkg.Tool, basePath string, au *aurora.Aurora) string 
 		}
 	}
 
-	installedVersion := strings.Split(strings.ToLower(outb.String()), "current version: ")
-	if len(installedVersion) == 2 {
-		installedVersionString := strings.TrimPrefix(strings.TrimSpace(string(installedVersion[1])), "v")
-		if strings.Contains(tool.Version, installedVersionString) {
+	if installedVersion != "" {
+		if strings.Contains(tool.Version, installedVersion) {
 			msg = fmt.Sprintf("(%s) (%s)", au.BrightGreen("latest").String(), au.BrightGreen(tool.Version).String())
 		} else {
 			msg = fmt.Sprintf("(%s) (%s) ➡ (%s)",
 				au.Red("outdated").String(),
-				au.Red(installedVersionString).String(),
+				au.Red(installedVersion).String(),
 				au.BrightGreen(tool.Version).String())
 		}
 	}
+
 	return msg
 }
 
-func isOsAvailable(tool pkg.Tool) bool {
+func isOsAvailable(tool types.Tool) bool {
 	osData := path.CheckOS()
 	for asset := range tool.Assets {
 		expectedAssetPrefix := tool.Name + "_" + tool.Version + "_" + osData

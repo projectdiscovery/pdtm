@@ -10,6 +10,7 @@ import (
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/pdtm/pkg"
 	"github.com/projectdiscovery/pdtm/pkg/path"
+	"github.com/projectdiscovery/pdtm/pkg/types"
 	"github.com/projectdiscovery/pdtm/pkg/utils"
 	errorutil "github.com/projectdiscovery/utils/errors"
 	stringsutil "github.com/projectdiscovery/utils/strings"
@@ -45,7 +46,7 @@ func (r *Runner) Run() error {
 	}
 
 	toolListApi, err := utils.FetchToolList()
-	var toolList []pkg.Tool
+	var toolList []types.Tool
 
 	for _, tool := range toolListApi {
 		if !stringsutil.ContainsAny(tool.Name, blacklistTool...) {
@@ -56,7 +57,11 @@ func (r *Runner) Run() error {
 	// if toolList is not nil save/update the cache
 	// else fetch from cache file
 	if toolList != nil {
-		go UpdateCache(toolList) //nolint:errcheck
+		go func() {
+			if err := UpdateCache(toolList); err != nil {
+				gologger.Warning().Msgf("%s\n", err)
+			}
+		}()
 	} else {
 		toolList, err = FetchFromCache()
 		if err != nil {
@@ -93,7 +98,7 @@ func (r *Runner) Run() error {
 		}
 		if i, ok := utils.Contains(toolList, tool); ok {
 			if err := pkg.Install(r.options.Path, toolList[i]); err != nil {
-				if err == pkg.ErrIsInstalled {
+				if err == types.ErrIsInstalled {
 					gologger.Info().Msgf("%s: %s", tool, err)
 				} else {
 					gologger.Error().Msgf("error while installing %s: %s", tool, err)
@@ -110,7 +115,7 @@ func (r *Runner) Run() error {
 		}
 		if i, ok := utils.Contains(toolList, tool); ok {
 			if err := pkg.Update(r.options.Path, toolList[i]); err != nil {
-				if err == pkg.ErrIsUpToDate {
+				if err == types.ErrIsUpToDate {
 					gologger.Info().Msgf("%s: %s", tool, err)
 				} else {
 					gologger.Info().Msgf("%s\n", err)
@@ -142,7 +147,7 @@ func (r *Runner) Run() error {
 }
 
 // UpdateCache creates/updates cache file
-func UpdateCache(toolList []pkg.Tool) error {
+func UpdateCache(toolList []types.Tool) error {
 	b, err := json.Marshal(toolList)
 	if err != nil {
 		return err
@@ -151,20 +156,20 @@ func UpdateCache(toolList []pkg.Tool) error {
 }
 
 // FetchFromCache loads tool list from cache file
-func FetchFromCache() ([]pkg.Tool, error) {
+func FetchFromCache() ([]types.Tool, error) {
 	b, err := os.ReadFile(cacheFile)
 	if err != nil {
 		return nil, err
 	}
-	var toolList []pkg.Tool
+	var toolList []types.Tool
 	if err := json.Unmarshal(b, &toolList); err != nil {
 		return nil, err
 	}
 	return toolList, nil
 }
 
-// ListTools prints the list of tools
-func (r *Runner) ListToolsAndEnv(tools []pkg.Tool) error {
+// ListToolsAndEnv prints the list of tools
+func (r *Runner) ListToolsAndEnv(tools []types.Tool) error {
 	gologger.Info().Msgf(path.GetOsData() + "\n")
 	gologger.Info().Msgf("Path to download project binary: %s\n", r.options.Path)
 	var fmtMsg string

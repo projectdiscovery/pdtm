@@ -1,4 +1,4 @@
-// Package winpath is useful for managing PATH as part of the Environment
+// Package path is useful for managing PATH as part of the Environment
 // in the Windows HKey Local User registry. It returns an error for most
 // operations on non-Windows systems.
 package path

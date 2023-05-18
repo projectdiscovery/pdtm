@@ -1,24 +1,22 @@
 package pkg
 
 import (
-	"bytes"
 	"fmt"
 	"os"
-	"os/exec"
-	"path/filepath"
 	"strings"
 
 	ospath "github.com/projectdiscovery/pdtm/pkg/path"
-	stringsutil "github.com/projectdiscovery/utils/strings"
+	"github.com/projectdiscovery/pdtm/pkg/types"
+	"github.com/projectdiscovery/pdtm/pkg/version"
 
 	"github.com/projectdiscovery/gologger"
 )
 
 // Update updates a given tool
-func Update(path string, tool Tool) error {
+func Update(path string, tool types.Tool) error {
 	if executablePath, exists := ospath.GetExecutablePath(path, tool.Name); exists {
 		if isUpToDate(tool, path) {
-			return ErrIsUpToDate
+			return types.ErrIsUpToDate
 		}
 		gologger.Info().Msgf("updating %s...", tool.Name)
 		if err := os.Remove(executablePath); err != nil {
@@ -31,22 +29,11 @@ func Update(path string, tool Tool) error {
 		gologger.Info().Msgf("updated %s to %s (%s)", tool.Name, version, au.BrightGreen("latest").String())
 		return nil
 	} else {
-		return fmt.Errorf(ErrToolNotFound, tool.Name, executablePath)
+		return fmt.Errorf(types.ErrToolNotFound, tool.Name, executablePath)
 	}
 }
 
-func isUpToDate(tool Tool, path string) bool {
-	cmd := exec.Command(filepath.Join(path, tool.Name), "--version")
-
-	var outb bytes.Buffer
-	cmd.Stdout = &outb
-	cmd.Stderr = &outb
-	err := cmd.Run()
-	if err != nil {
-		return false
-	}
-	out := strings.ToLower(outb.String())
-	v, err := stringsutil.Between(out, "current version:", "\n")
-	v = strings.Trim(v, "\n v")
+func isUpToDate(tool types.Tool, path string) bool {
+	v, err := version.ExtractInstalledVersion(tool, path)
 	return err == nil && strings.EqualFold(tool.Version, v)
 }

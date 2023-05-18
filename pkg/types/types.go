@@ -1,8 +1,6 @@
-package pkg
+package types
 
-import (
-	"errors"
-)
+import "errors"
 
 const Organization = "projectdiscovery"
 
@@ -19,4 +17,9 @@ type Tool struct {
 	Repo    string            `json:"repo"`
 	Version string            `json:"version"`
 	Assets  map[string]string `json:"assets"`
+}
+
+type NucleiData struct {
+	IgnoreHash string `json:"ignore-hash"`
+	Tools      []Tool `json:"tools"`
 }
