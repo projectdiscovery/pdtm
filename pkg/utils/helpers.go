@@ -30,7 +30,7 @@ func GetUpdaterCallback(toolName string) func() {
 		if err != nil {
 			gologger.Error().Msg(err.Error())
 		}
-		err = pkg.Update(dp, tool)
+		err = pkg.Update(dp, tool, false)
 		if err == types.ErrIsUpToDate {
 			gologger.Info().Msgf("%s: %s", toolName, err)
 		} else {
