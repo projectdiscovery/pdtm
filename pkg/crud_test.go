@@ -77,7 +77,7 @@ func TestUpdateSameVersion(t *testing.T) {
 	assert.Nil(t, err)
 
 	// updating a tool to the same version should trigger an error
-	err = Update(pathBin, tool)
+	err = Update(pathBin, tool, true)
 	assert.Equal(t, "already up to date", err.Error())
 }
 
@@ -89,6 +89,6 @@ func TestUpdateNonExistingTool(t *testing.T) {
 	defer os.RemoveAll(pathBin)
 
 	// updating non existing tool should error
-	err = Update(pathBin, tool)
+	err = Update(pathBin, tool, true)
 	assert.NotNil(t, err)
 }

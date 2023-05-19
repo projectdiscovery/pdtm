@@ -114,7 +114,7 @@ func (r *Runner) Run() error {
 			continue
 		}
 		if i, ok := utils.Contains(toolList, tool); ok {
-			if err := pkg.Update(r.options.Path, toolList[i]); err != nil {
+			if err := pkg.Update(r.options.Path, toolList[i], r.options.DisableChangeLog); err != nil {
 				if err == types.ErrIsUpToDate {
 					gologger.Info().Msgf("%s: %s", tool, err)
 				} else {

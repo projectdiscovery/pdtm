@@ -31,7 +31,7 @@ func GetUpdaterCallback(toolName string) func() {
 			gologger.Error().Msgf("failed to fetch details of %v skipping update: %v", toolName, err)
 			return
 		}
-		err = pkg.Update(dp, tool)
+		err = pkg.Update(dp, tool, false)
 		if err == types.ErrIsUpToDate {
 			gologger.Info().Msgf("%s: %s", toolName, err)
 		} else {
