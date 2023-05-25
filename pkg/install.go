@@ -19,6 +19,7 @@ import (
 	"github.com/logrusorgru/aurora/v4"
 	"github.com/projectdiscovery/gologger"
 	ospath "github.com/projectdiscovery/pdtm/pkg/path"
+	"github.com/projectdiscovery/pdtm/pkg/types"
 )
 
 var (
@@ -27,20 +28,20 @@ var (
 )
 
 // Install installs given tool at path
-func Install(path string, tool Tool) error {
+func Install(path string, tool types.Tool) error {
 	if _, exists := ospath.GetExecutablePath(path, tool.Name); exists {
-		return ErrIsInstalled
+		return types.ErrIsInstalled
 	}
 	gologger.Info().Msgf("installing %s...", tool.Name)
 	version, err := install(tool, path)
 	if err != nil {
 		return err
 	}
-	gologger.Info().Msgf("installed %s %s (%s)", tool.Name, version, au.Green("latest").String())
+	gologger.Info().Msgf("installed %s %s (%s)", tool.Name, version, au.BrightGreen("latest").String())
 	return nil
 }
 
-func install(tool Tool, path string) (string, error) {
+func install(tool types.Tool, path string) (string, error) {
 	builder := &strings.Builder{}
 	builder.WriteString(tool.Name)
 	builder.WriteString("_")
@@ -76,10 +77,10 @@ loop:
 
 	// handle if id is zero (no asset found)
 	if id == 0 {
-		return "", fmt.Errorf(ErrNoAssetFound, runtime.GOOS, runtime.GOARCH)
+		return "", fmt.Errorf(types.ErrNoAssetFound, runtime.GOOS, runtime.GOARCH)
 	}
 
-	_, rdurl, err := GithubClient().Repositories.DownloadReleaseAsset(context.Background(), Organization, tool.Repo, int64(id))
+	_, rdurl, err := GithubClient().Repositories.DownloadReleaseAsset(context.Background(), types.Organization, tool.Repo, int64(id))
 	if err != nil {
 		if arlErr, ok := err.(*github.AbuseRateLimitError); ok {
 			// Provide user with more info regarding the rate limit

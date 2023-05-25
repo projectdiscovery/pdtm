@@ -5,16 +5,16 @@ import (
 	updateutils "github.com/projectdiscovery/utils/update"
 )
 
-const version = "v0.0.6"
+const version = "v0.0.7"
 
-var banner = (`
+var banner = `
                 ____          
      ____  ____/ / /_____ ___ 
     / __ \/ __  / __/ __ __  \
    / /_/ / /_/ / /_/ / / / / /
   / .___/\__,_/\__/_/ /_/ /_/ 
  /_/                         
-`)
+`
 
 // showBanner is used to show the banner to the user
 func showBanner() {

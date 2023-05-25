@@ -85,10 +85,11 @@ REMOVE:
    -rp, -remove-path     remove path from PATH environment variables
 
 DEBUG:
-   -sp, -show-path  show the current binary path then exit
-   -version         show version of the project
-   -v, -verbose     show verbose output
-   -nc, -no-color   disable output content coloring (ANSI escape codes)
+   -sp, -show-path          show the current binary path then exit
+   -version                 show version of the project
+   -v, -verbose             show verbose output
+   -nc, -no-color           disable output content coloring (ANSI escape codes)
+   -disable-changelog, -dc  disable release changelog in output
 ```
 
 ## Running pdtm

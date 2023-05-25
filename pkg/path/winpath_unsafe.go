@@ -1,5 +1,4 @@
 //go:build windows && !nounsafe
-// +build windows,!nounsafe
 
 package path
 

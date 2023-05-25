@@ -5,12 +5,13 @@ import (
 	"os"
 
 	ospath "github.com/projectdiscovery/pdtm/pkg/path"
+	"github.com/projectdiscovery/pdtm/pkg/types"
 
 	"github.com/projectdiscovery/gologger"
 )
 
 // Remove removes given tool
-func Remove(path string, tool Tool) error {
+func Remove(path string, tool types.Tool) error {
 	executablePath, exists := ospath.GetExecutablePath(path, tool.Name)
 	if exists {
 		gologger.Info().Msgf("removing %s...", tool.Name)
@@ -21,5 +22,5 @@ func Remove(path string, tool Tool) error {
 		gologger.Info().Msgf("removed %s", tool.Name)
 		return nil
 	}
-	return fmt.Errorf(ErrToolNotFound, tool.Name, executablePath)
+	return fmt.Errorf(types.ErrToolNotFound, tool.Name, executablePath)
 }

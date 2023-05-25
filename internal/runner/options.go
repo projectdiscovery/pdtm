@@ -51,6 +51,7 @@ type Options struct {
 	Version            bool
 	ShowPath           bool
 	DisableUpdateCheck bool
+	DisableChangeLog   bool
 }
 
 // ParseOptions parses the command line flags provided by a user
@@ -89,6 +90,7 @@ func ParseOptions() *Options {
 		flagSet.BoolVar(&options.Version, "version", false, "show version of the project"),
 		flagSet.BoolVarP(&options.Verbose, "verbose", "v", false, "show verbose output"),
 		flagSet.BoolVarP(&options.NoColor, "no-color", "nc", false, "disable output content coloring (ANSI escape codes)"),
+		flagSet.BoolVarP(&options.DisableChangeLog, "dc", "disable-changelog", false, "disable release changelog in output"),
 	)
 
 	if err := flagSet.Parse(); err != nil {
@@ -114,7 +116,7 @@ func ParseOptions() *Options {
 	}
 
 	if !options.DisableUpdateCheck {
-		latestVersion, err := updateutils.GetVersionCheckCallback("pdtm")()
+		latestVersion, err := updateutils.GetToolVersionCallback("pdtm", version)()
 		if err != nil {
 			if options.Verbose {
 				gologger.Error().Msgf("pdtm version check failed: %v", err.Error())
@@ -146,6 +148,6 @@ func (options *Options) configureOutput() {
 	}
 }
 
-func (Options *Options) loadConfigFrom(location string) error {
-	return fileutil.Unmarshal(fileutil.YAML, []byte(location), Options)
+func (options *Options) loadConfigFrom(location string) error {
+	return fileutil.Unmarshal(fileutil.YAML, []byte(location), options)
 }

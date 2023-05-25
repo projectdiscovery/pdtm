@@ -4,11 +4,12 @@ import (
 	"os"
 	"testing"
 
+	"github.com/projectdiscovery/pdtm/pkg/types"
 	"github.com/stretchr/testify/assert"
 )
 
-func GetToolStruct() Tool {
-	tool := Tool{
+func GetToolStruct() types.Tool {
+	tool := types.Tool{
 		Name:    "dnsx",
 		Repo:    "dnsx",
 		Version: "1.1.1",
@@ -76,7 +77,7 @@ func TestUpdateSameVersion(t *testing.T) {
 	assert.Nil(t, err)
 
 	// updating a tool to the same version should trigger an error
-	err = Update(pathBin, tool)
+	err = Update(pathBin, tool, true)
 	assert.Equal(t, "already up to date", err.Error())
 }
 
@@ -88,6 +89,6 @@ func TestUpdateNonExistingTool(t *testing.T) {
 	defer os.RemoveAll(pathBin)
 
 	// updating non existing tool should error
-	err = Update(pathBin, tool)
+	err = Update(pathBin, tool, true)
 	assert.NotNil(t, err)
 }
