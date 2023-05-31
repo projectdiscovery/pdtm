@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"runtime"
 	"strings"
 
@@ -14,9 +15,15 @@ import (
 	"github.com/projectdiscovery/pdtm/pkg/version"
 )
 
-const (
-	host = "https://api.pdtm.sh"
-)
+var host = getEnv("PDTM_SERVER", "https://api.pdtm.sh")
+
+func getEnv(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	return value
+}
 
 var (
 	// Get current OS name, architecture, and Go version
