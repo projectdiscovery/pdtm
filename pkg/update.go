@@ -21,18 +21,23 @@ func Update(path string, tool types.Tool, disableChangeLog bool) error {
 			return types.ErrIsUpToDate
 		}
 		gologger.Info().Msgf("updating %s...", tool.Name)
-		if err := os.Remove(executablePath); err != nil {
-			return err
+
+		if len(tool.Assets) > 0 {
+			if err := os.Remove(executablePath); err != nil {
+				return err
+			}
+
+			version, err := install(tool, path)
+			if err != nil {
+				return err
+			}
+			if !disableChangeLog {
+				showReleaseNotes(tool.Name)
+			}
+			gologger.Info().Msgf("updated %s to %s (%s)", tool.Name, version, au.BrightGreen("latest").String())
+			return nil
 		}
-		version, err := install(tool, path)
-		if err != nil {
-			return err
-		}
-		if !disableChangeLog {
-			showReleaseNotes(tool.Name)
-		}
-		gologger.Info().Msgf("updated %s to %s (%s)", tool.Name, version, au.BrightGreen("latest").String())
-		return nil
+		return fmt.Errorf(types.ErrNoAssetFound, tool.Name, executablePath)
 	} else {
 		return fmt.Errorf(types.ErrToolNotFound, tool.Name, executablePath)
 	}
