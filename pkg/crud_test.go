@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	ospath "github.com/projectdiscovery/pdtm/pkg/path"
 	"github.com/projectdiscovery/pdtm/pkg/types"
 	"github.com/stretchr/testify/require"
 )
@@ -95,13 +96,22 @@ func TestUpdateNonExistingTool(t *testing.T) {
 
 func TestUpdateToolWithoutAssets(t *testing.T) {
 	tool := GetToolStruct()
-	tool.Assets = nil
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
 	require.Nil(t, err)
 	defer os.RemoveAll(pathBin)
 
-	// updating non existing tool should error
+	// install the tool
+	err = Install(pathBin, tool)
+	require.Nil(t, err)
+
+	// remove assets
+	tool.Assets = nil
+
+	// updating a tool without assets should trigger an error
 	err = Update(pathBin, tool, true)
 	require.NotNil(t, err)
+	// and leave the original binary in place
+	_, exists := ospath.GetExecutablePath(pathBin, tool.Name)
+	require.True(t, exists)
 }
