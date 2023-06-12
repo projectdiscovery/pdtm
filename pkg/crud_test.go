@@ -4,8 +4,9 @@ import (
 	"os"
 	"testing"
 
+	ospath "github.com/projectdiscovery/pdtm/pkg/path"
 	"github.com/projectdiscovery/pdtm/pkg/types"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func GetToolStruct() types.Tool {
@@ -33,62 +34,84 @@ func TestInstall(t *testing.T) {
 	tool := GetToolStruct()
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	defer os.RemoveAll(pathBin)
 
 	// install first time
 	err = Install(pathBin, tool)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	// installing again should trigger an error
 	err = Install(pathBin, tool)
-	assert.NotNil(t, err)
+	require.NotNil(t, err)
 }
 
 func TestRemove(t *testing.T) {
 	tool := GetToolStruct()
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	defer os.RemoveAll(pathBin)
 
 	// install the tool
 	err = Install(pathBin, tool)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	// remove it from path
 	err = Remove(pathBin, tool)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	// removing non existing tool triggers an error
 	err = Remove(pathBin, tool)
-	assert.NotNil(t, err)
+	require.NotNil(t, err)
 }
 
 func TestUpdateSameVersion(t *testing.T) {
 	tool := GetToolStruct()
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	defer os.RemoveAll(pathBin)
 
 	// install the tool
 	err = Install(pathBin, tool)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	// updating a tool to the same version should trigger an error
 	err = Update(pathBin, tool, true)
-	assert.Equal(t, "already up to date", err.Error())
+	require.Equal(t, "already up to date", err.Error())
 }
 
 func TestUpdateNonExistingTool(t *testing.T) {
 	tool := GetToolStruct()
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	defer os.RemoveAll(pathBin)
 
 	// updating non existing tool should error
 	err = Update(pathBin, tool, true)
-	assert.NotNil(t, err)
+	require.NotNil(t, err)
+}
+
+func TestUpdateToolWithoutAssets(t *testing.T) {
+	tool := GetToolStruct()
+
+	pathBin, err := os.MkdirTemp("", "test-dir")
+	require.Nil(t, err)
+	defer os.RemoveAll(pathBin)
+
+	// install the tool
+	err = Install(pathBin, tool)
+	require.Nil(t, err)
+
+	// remove assets
+	tool.Assets = nil
+
+	// updating a tool without assets should trigger an error
+	err = Update(pathBin, tool, true)
+	require.NotNil(t, err)
+	// and leave the original binary in place
+	_, exists := ospath.GetExecutablePath(pathBin, tool.Name)
+	require.True(t, exists)
 }

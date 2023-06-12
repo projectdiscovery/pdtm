@@ -21,9 +21,15 @@ func Update(path string, tool types.Tool, disableChangeLog bool) error {
 			return types.ErrIsUpToDate
 		}
 		gologger.Info().Msgf("updating %s...", tool.Name)
+
+		if len(tool.Assets) == 0 {
+			return fmt.Errorf(types.ErrNoAssetFound, tool.Name, executablePath)
+		}
+
 		if err := os.Remove(executablePath); err != nil {
 			return err
 		}
+
 		version, err := install(tool, path)
 		if err != nil {
 			return err
