@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/charmbracelet/glamour v0.6.0
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/projectdiscovery/goflags v0.1.8
+	github.com/projectdiscovery/goflags v0.1.9
 	github.com/projectdiscovery/gologger v1.1.10
 	github.com/projectdiscovery/utils v0.0.37
 	github.com/stretchr/testify v1.8.4
@@ -24,6 +24,7 @@ require (
 	github.com/dlclark/regexp2 v1.8.1 // indirect
 	github.com/fatih/color v1.14.1 // indirect
 	github.com/google/go-github/v30 v30.1.0 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
@@ -60,7 +61,6 @@ require (
 	github.com/nwaples/rardecode v1.1.0 // indirect
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
 	github.com/ulikunitz/xz v0.5.8 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
