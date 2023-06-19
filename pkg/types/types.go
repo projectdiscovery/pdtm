@@ -13,10 +13,23 @@ var (
 )
 
 type Tool struct {
-	Name    string            `json:"name"`
-	Repo    string            `json:"repo"`
-	Version string            `json:"version"`
-	Assets  map[string]string `json:"assets"`
+	Name         string            `json:"name"`
+	Repo         string            `json:"repo"`
+	Version      string            `json:"version"`
+	Requirements []ToolRequirement `json:"requirements"`
+	Assets       map[string]string `json:"assets"`
+}
+
+type ToolRequirement struct {
+	OS            string                         `json:"os"`
+	Specification []ToolRequirementSpecification `json:"specification"`
+}
+
+type ToolRequirementSpecification struct {
+	Name        string `json:"name"`
+	Required    bool   `json:"required"`
+	Command     string `json:"command"`
+	Instruction string `json:"instruction"`
 }
 
 type NucleiData struct {

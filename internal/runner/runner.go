@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
+	"strings"
 
 	"github.com/projectdiscovery/gologger"
 	"github.com/projectdiscovery/pdtm/pkg"
@@ -14,9 +16,10 @@ import (
 	"github.com/projectdiscovery/pdtm/pkg/utils"
 	errorutil "github.com/projectdiscovery/utils/errors"
 	stringsutil "github.com/projectdiscovery/utils/strings"
+	"github.com/projectdiscovery/utils/syscallutil"
 )
 
-var blacklistTool = []string{"nuclei-templates"}
+var excludedToolList = []string{"nuclei-templates"}
 
 // Runner contains the internal logic of the program
 type Runner struct {
@@ -49,7 +52,7 @@ func (r *Runner) Run() error {
 	var toolList []types.Tool
 
 	for _, tool := range toolListApi {
-		if !stringsutil.ContainsAny(tool.Name, blacklistTool...) {
+		if !stringsutil.ContainsAny(tool.Name, excludedToolList...) {
 			toolList = append(toolList, tool)
 		}
 	}
@@ -91,21 +94,24 @@ func (r *Runner) Run() error {
 	}
 	gologger.Verbose().Msgf("using path %s", r.options.Path)
 
-	for _, tool := range r.options.Install {
+	for _, toolName := range r.options.Install {
+
 		if !path.IsSubPath(homeDir, r.options.Path) {
-			gologger.Error().Msgf("skipping install outside home folder: %s", tool)
+			gologger.Error().Msgf("skipping install outside home folder: %s", toolName)
 			continue
 		}
-		if i, ok := utils.Contains(toolList, tool); ok {
+		if i, ok := utils.Contains(toolList, toolName); ok {
 			if err := pkg.Install(r.options.Path, toolList[i]); err != nil {
 				if err == types.ErrIsInstalled {
-					gologger.Info().Msgf("%s: %s", tool, err)
+					gologger.Info().Msgf("%s: %s", toolName, err)
 				} else {
-					gologger.Error().Msgf("error while installing %s: %s", tool, err)
+					gologger.Error().Msgf("error while installing %s: %s", toolName, err)
 				}
 			}
+			tool := getTool(toolName, toolList)
+			printRequirementInfo(tool)
 		} else {
-			gologger.Error().Msgf("error while installing %s: %s not found in the list", tool, tool)
+			gologger.Error().Msgf("error while installing %s: %s not found in the list", toolName, toolName)
 		}
 	}
 	for _, tool := range r.options.Update {
@@ -144,6 +150,45 @@ func (r *Runner) Run() error {
 		return r.ListToolsAndEnv(toolList)
 	}
 	return nil
+}
+
+func printRequirementInfo(tool *types.Tool) {
+	specs := getSpecs(tool)
+
+	printTitle := true
+	for _, spec := range specs {
+		if requirementSatisfied(spec.Name) {
+			continue
+		}
+		if printTitle {
+			fmt.Printf("%s\n", au.Bold(tool.Name+" requirements:").String())
+			printTitle = false
+		}
+		instruction := getFormattedInstruction(spec)
+		isRequired := getRequirementStatus(spec)
+		fmt.Printf("%s %s\n", isRequired, instruction)
+	}
+}
+
+func getRequirementStatus(spec types.ToolRequirementSpecification) string {
+	if spec.Required {
+		return au.BrightRed("required").String()
+	}
+	return au.BrightGreen("optional").String()
+}
+
+func getFormattedInstruction(spec types.ToolRequirementSpecification) string {
+	return strings.Replace(spec.Instruction, "$CMD", spec.Command, 1)
+}
+
+func getSpecs(tool *types.Tool) []types.ToolRequirementSpecification {
+	var specs []types.ToolRequirementSpecification
+	for _, requirement := range tool.Requirements {
+		if requirement.OS == runtime.GOOS {
+			specs = append(specs, requirement.Specification...)
+		}
+	}
+	return specs
 }
 
 // UpdateCache creates/updates cache file
@@ -189,3 +234,18 @@ func (r *Runner) ListToolsAndEnv(tools []types.Tool) error {
 
 // Close the runner instance
 func (r *Runner) Close() {}
+
+func getTool(toolName string, tools []types.Tool) *types.Tool {
+	for _, tool := range tools {
+		if toolName == tool.Name {
+			return &tool
+		}
+	}
+	return nil
+}
+
+func requirementSatisfied(requirementName string) bool {
+	_, execErr := exec.LookPath(requirementName)
+	_, sysErr := syscallutil.LoadLibrary(requirementName)
+	return sysErr == nil || execErr == nil
+}

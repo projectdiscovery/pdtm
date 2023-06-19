@@ -22,6 +22,7 @@ require (
 	github.com/cheggaaa/pb/v3 v3.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.8.1 // indirect
+	github.com/ebitengine/purego v0.3.2 // indirect
 	github.com/fatih/color v1.14.1 // indirect
 	github.com/google/go-github/v30 v30.1.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
