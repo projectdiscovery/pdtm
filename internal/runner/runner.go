@@ -156,17 +156,21 @@ func printRequirementInfo(tool *types.Tool) {
 	specs := getSpecs(tool)
 
 	printTitle := true
+	stringBuilder := &strings.Builder{}
 	for _, spec := range specs {
 		if requirementSatisfied(spec.Name) {
 			continue
 		}
 		if printTitle {
-			fmt.Printf("%s\n", au.Bold(tool.Name+" requirements:").String())
+			stringBuilder.WriteString(fmt.Sprintf("%s\n", au.Bold(tool.Name+" requirements:").String()))
 			printTitle = false
 		}
 		instruction := getFormattedInstruction(spec)
 		isRequired := getRequirementStatus(spec)
-		fmt.Printf("%s %s\n", isRequired, instruction)
+		stringBuilder.WriteString(fmt.Sprintf("%s %s\n", isRequired, instruction))
+	}
+	if stringBuilder.Len() > 0 {
+		gologger.Info().Msgf("%s", stringBuilder.String())
 	}
 }
 
