@@ -176,7 +176,7 @@ func printRequirementInfo(tool *types.Tool) {
 
 func getRequirementStatus(spec types.ToolRequirementSpecification) string {
 	if spec.Required {
-		return au.BrightRed("required").String()
+		return au.Yellow("required").String()
 	}
 	return au.BrightGreen("optional").String()
 }
