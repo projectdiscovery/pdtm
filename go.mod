@@ -7,7 +7,7 @@ require (
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/projectdiscovery/goflags v0.1.8
 	github.com/projectdiscovery/gologger v1.1.10
-	github.com/projectdiscovery/utils v0.0.38
+	github.com/projectdiscovery/utils v0.0.39
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/oauth2 v0.9.0
 	golang.org/x/sys v0.9.0
@@ -54,7 +54,7 @@ require (
 	github.com/logrusorgru/aurora/v4 v4.0.0
 	github.com/mholt/archiver v3.1.1+incompatible // indirect
 	github.com/microcosm-cc/bluemonday v1.0.24 // indirect
-	github.com/miekg/dns v1.1.54 // indirect
+	github.com/miekg/dns v1.1.55 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nwaples/rardecode v1.1.0 // indirect
