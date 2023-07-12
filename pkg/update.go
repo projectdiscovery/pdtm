@@ -35,7 +35,7 @@ func Update(path string, tool types.Tool, disableChangeLog bool) error {
 			return err
 		}
 		if !disableChangeLog {
-			showReleaseNotes(tool.Name)
+			showReleaseNotes(tool.Repo)
 		}
 		gologger.Info().Msgf("updated %s to %s (%s)", tool.Name, version, au.BrightGreen("latest").String())
 		return nil
