@@ -7,7 +7,7 @@ require (
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/projectdiscovery/goflags v0.1.12
 	github.com/projectdiscovery/gologger v1.1.11
-	github.com/projectdiscovery/utils v0.0.44
+	github.com/projectdiscovery/utils v0.0.45
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/oauth2 v0.10.0
 	golang.org/x/sys v0.10.0
@@ -22,7 +22,7 @@ require (
 	github.com/cheggaaa/pb/v3 v3.1.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.8.1 // indirect
-	github.com/ebitengine/purego v0.3.2 // indirect
+	github.com/ebitengine/purego v0.4.0 // indirect
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/google/go-github/v30 v30.1.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
@@ -55,7 +55,7 @@ require (
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/logrusorgru/aurora/v4 v4.0.0
 	github.com/mholt/archiver v3.1.1+incompatible // indirect
-	github.com/microcosm-cc/bluemonday v1.0.24 // indirect
+	github.com/microcosm-cc/bluemonday v1.0.25 // indirect
 	github.com/miekg/dns v1.1.55 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
