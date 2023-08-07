@@ -10,7 +10,7 @@ require (
 	github.com/projectdiscovery/utils v0.0.46
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/oauth2 v0.10.0
-	golang.org/x/sys v0.10.0
+	golang.org/x/sys v0.11.0
 )
 
 require (
