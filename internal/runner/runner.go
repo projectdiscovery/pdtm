@@ -107,6 +107,14 @@ func (r *Runner) Run() error {
 				} else {
 					gologger.Error().Msgf("error while installing %s: %s", toolName, err)
 				}
+
+				gologger.Info().Msgf("trying to install %s using go install", toolName)
+				if err := fallbackGoInstall(toolName); err != nil {
+					gologger.Error().Msgf("error while installing %s using go install: %s", toolName, err)
+				} else {
+					gologger.Info().Msgf("successfully installed %s using go install", toolName)
+				}
+
 			}
 			tool := getTool(toolName, toolList)
 			printRequirementInfo(tool)
@@ -148,6 +156,17 @@ func (r *Runner) Run() error {
 	}
 	if len(r.options.Install) == 0 && len(r.options.Update) == 0 && len(r.options.Remove) == 0 {
 		return r.ListToolsAndEnv(toolList)
+	}
+	return nil
+}
+
+func fallbackGoInstall(toolName string) error {
+	cmd := exec.Command("go", "install", "-v", fmt.Sprintf("github.com/projectdiscovery/%s/v2/cmd/%s@latest", toolName, toolName))
+	if _, err := cmd.CombinedOutput(); err != nil {
+		cmd = exec.Command("go", "install", "-v", fmt.Sprintf("github.com/projectdiscovery/%s/cmd/%s@latest", toolName, toolName))
+		if output, err := cmd.CombinedOutput(); err != nil {
+			return fmt.Errorf("go install failed for %s: %s", toolName, string(output))
+		}
 	}
 	return nil
 }
