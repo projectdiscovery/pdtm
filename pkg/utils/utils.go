@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/denisbrodbeck/machineid"
 	"github.com/logrusorgru/aurora/v4"
 	"github.com/projectdiscovery/pdtm/pkg/path"
 	"github.com/projectdiscovery/pdtm/pkg/types"
@@ -27,9 +28,10 @@ func getEnv(key, defaultValue string) string {
 
 var (
 	// Get current OS name, architecture, and Go version
-	osName    = runtime.GOOS
-	osArch    = runtime.GOARCH
-	goVersion = runtime.Version()
+	osName       = runtime.GOOS
+	osArch       = runtime.GOARCH
+	goVersion    = runtime.Version()
+	machineId, _ = machineid.ProtectedID("pdtm")
 )
 
 // configure aurora for logging
@@ -39,7 +41,7 @@ func FetchToolList() ([]types.Tool, error) {
 	tools := make([]types.Tool, 0)
 
 	// Create the request URL with query parameters
-	reqURL := fmt.Sprintf("%s/api/v1/tools/?os=%s&arch=%s&go_version=%s", host, osName, osArch, goVersion)
+	reqURL := fmt.Sprintf("%s/api/v1/tools/?os=%s&arch=%s&go_version=%s&machineid=%s", host, osName, osArch, goVersion, machineId)
 
 	resp, err := http.Get(reqURL)
 	if err != nil {
@@ -64,7 +66,7 @@ func FetchToolList() ([]types.Tool, error) {
 func fetchTool(toolName string) (types.Tool, error) {
 	var tool types.Tool
 	// Create the request URL to get tool
-	reqURL := fmt.Sprintf("%s/api/v1/tools/%s?os=%s&arch=%s&go_version=%s", host, toolName, osName, osArch, goVersion)
+	reqURL := fmt.Sprintf("%s/api/v1/tools/%s?os=%s&arch=%s&go_version=%s&machineid=%s", host, toolName, osName, osArch, goVersion, machineId)
 	resp, err := http.Get(reqURL)
 	if err != nil {
 		return tool, err
