@@ -9,13 +9,14 @@ We collect the following types of information from users of API:
 - OS name
 - OS architecture
 - Go version
+- MachineID ([Hashed](https://github.com/denisbrodbeck/machineid#function-protectedidappid-string-string-error))
 - IP address
 
 This information is collected automatically when the API is used and is used to improve the project functionality / availability.
 
 ## Use of Information
 
-We use the information collected from users of our API to improve the performance and functionality of the API. This may include analyzing usage patterns, troubleshooting technical issues, and identifying areas for improvement.
+We use the information collected from users of our API to improve the performance and functionality of the OSS Projects. This may include analyzing usage patterns, troubleshooting technical issues, and identifying areas for improvement.
 
 ## Sharing of Information
 
@@ -31,4 +32,4 @@ We reserve the right to change this Policy at any time. If we make changes to th
 
 If you have any questions or concerns about this Policy, please contact us at contact@projectdiscovery.io
 
-Last updated: January 17, 2023
+Last updated: September 23, 2023
