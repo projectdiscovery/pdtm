@@ -159,11 +159,8 @@ func (r *Runner) Run() error {
 }
 
 func fallbackGoInstall(tool *types.Tool) error {
-	err := os.Setenv("GOBIN", defaultPath)
-	if err != nil {
-		return fmt.Errorf("failed to set GOBIN: %s", err)
-	}
 	cmd := exec.Command("go", "install", "-v", fmt.Sprintf("github.com/projectdiscovery/%s/%s", tool.Name, tool.GoInstallPath))
+	cmd.Env = append(os.Environ(), "GOBIN="+defaultPath)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("go install failed for %s: %s", tool.Name, string(output))
 	}
