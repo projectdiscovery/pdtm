@@ -249,7 +249,29 @@ func getTool(toolName string, tools []types.Tool) *types.Tool {
 }
 
 func requirementSatisfied(requirementName string) bool {
+	if strings.HasPrefix(requirementName, "lib") {
+		libNames := appendLibExtensionForOS(requirementName)
+		for _, libName := range libNames {
+			_, sysErr := syscallutil.LoadLibrary(libName)
+			if sysErr == nil {
+				return true
+			}
+		}
+		return false
+	}
 	_, execErr := exec.LookPath(requirementName)
-	_, sysErr := syscallutil.LoadLibrary(requirementName)
-	return sysErr == nil || execErr == nil
+	return execErr == nil
+}
+
+func appendLibExtensionForOS(lib string) []string {
+	switch runtime.GOOS {
+	case "windows":
+		return []string{fmt.Sprintf("%s.dll", lib), lib}
+	case "linux":
+		return []string{fmt.Sprintf("%s.so", lib), lib}
+	case "darwin":
+		return []string{fmt.Sprintf("%s.dylib", lib), lib}
+	default:
+		return []string{lib}
+	}
 }
