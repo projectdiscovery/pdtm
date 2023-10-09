@@ -53,7 +53,7 @@ func GoInstall(path string, tool types.Tool) error {
 	if output, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("go install failed %s", string(output))
 	}
-	gologger.Info().Msgf("installed %s (%s)", tool.Name, au.BrightGreen("latest").String())
+	gologger.Info().Msgf("installed %s %s (%s)", tool.Name, tool.Version, au.BrightGreen("latest").String())
 	return nil
 }
 
