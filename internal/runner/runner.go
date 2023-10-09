@@ -101,14 +101,20 @@ func (r *Runner) Run() error {
 			continue
 		}
 		if i, ok := utils.Contains(toolList, toolName); ok {
+			tool := getTool(toolName, toolList)
 			if err := pkg.Install(r.options.Path, toolList[i]); err != nil {
-				if err == types.ErrIsInstalled {
+				if errors.Is(err, types.ErrIsInstalled) {
 					gologger.Info().Msgf("%s: %s", toolName, err)
 				} else {
 					gologger.Error().Msgf("error while installing %s: %s", toolName, err)
+					gologger.Info().Msgf("trying to install %s using go install", toolName)
+					if err := fallbackGoInstall(tool); err != nil {
+						gologger.Error().Msgf("error while installing %s using go install: %s", toolName, err)
+					} else {
+						gologger.Info().Msgf("successfully installed %s using go install", toolName)
+					}
 				}
 			}
-			tool := getTool(toolName, toolList)
 			printRequirementInfo(tool)
 		} else {
 			gologger.Error().Msgf("error while installing %s: %s not found in the list", toolName, toolName)
@@ -148,6 +154,15 @@ func (r *Runner) Run() error {
 	}
 	if len(r.options.Install) == 0 && len(r.options.Update) == 0 && len(r.options.Remove) == 0 {
 		return r.ListToolsAndEnv(toolList)
+	}
+	return nil
+}
+
+func fallbackGoInstall(tool *types.Tool) error {
+	cmd := exec.Command("go", "install", "-v", fmt.Sprintf("github.com/projectdiscovery/%s/%s", tool.Name, tool.GoInstallPath))
+	cmd.Env = append(os.Environ(), "GOBIN="+defaultPath)
+	if output, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("go install failed for %s: %s", tool.Name, string(output))
 	}
 	return nil
 }
