@@ -250,15 +250,6 @@ func (r *Runner) ListToolsAndEnv(tools []types.Tool) error {
 // Close the runner instance
 func (r *Runner) Close() {}
 
-func getTool(toolName string, tools []types.Tool) *types.Tool {
-	for _, tool := range tools {
-		if toolName == tool.Name {
-			return &tool
-		}
-	}
-	return nil
-}
-
 func requirementSatisfied(requirementName string) bool {
 	_, execErr := exec.LookPath(requirementName)
 	_, sysErr := syscallutil.LoadLibrary(requirementName)
