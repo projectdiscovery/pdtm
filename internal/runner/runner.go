@@ -95,24 +95,33 @@ func (r *Runner) Run() error {
 	gologger.Verbose().Msgf("using path %s", r.options.Path)
 
 	for _, toolName := range r.options.Install {
-
 		if !path.IsSubPath(homeDir, r.options.Path) {
 			gologger.Error().Msgf("skipping install outside home folder: %s", toolName)
 			continue
 		}
 		if i, ok := utils.Contains(toolList, toolName); ok {
-			if err := pkg.Install(r.options.Path, toolList[i]); err != nil {
+			tool := toolList[i]
+			if tool.InstallType == types.Go {
+				gologger.Info().Msgf("installing %s using go install", tool.Name)
+				if err := pkg.GoInstall(r.options.Path, tool); err != nil {
+					gologger.Error().Msgf("%s: %s", tool.Name, err)
+				}
+				printRequirementInfo(tool)
+				continue
+			}
+
+			if err := pkg.Install(r.options.Path, tool); err != nil {
 				if errors.Is(err, types.ErrIsInstalled) {
-					gologger.Info().Msgf("%s: %s", toolName, err)
+					gologger.Info().Msgf("%s: %s", tool.Name, err)
 				} else {
-					gologger.Error().Msgf("error while installing %s: %s", toolName, err)
-					gologger.Info().Msgf("trying to install %s using go install", toolName)
-					if err := pkg.GoInstall(r.options.Path, toolList[i]); err != nil {
-						gologger.Error().Msgf("%s: %s", toolName, err)
+					gologger.Error().Msgf("error while installing %s: %s", tool.Name, err)
+					gologger.Info().Msgf("trying to install %s using go install", tool.Name)
+					if err := pkg.GoInstall(r.options.Path, tool); err != nil {
+						gologger.Error().Msgf("%s: %s", tool.Name, err)
 					}
 				}
 			}
-			printRequirementInfo(toolList[i])
+			printRequirementInfo(tool)
 		} else {
 			gologger.Error().Msgf("error while installing %s: %s not found in the list", toolName, toolName)
 		}
