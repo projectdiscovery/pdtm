@@ -102,7 +102,6 @@ func (r *Runner) Run() error {
 		if i, ok := utils.Contains(toolList, toolName); ok {
 			tool := toolList[i]
 			if tool.InstallType == types.Go {
-				gologger.Info().Msgf("installing %s using go install", tool.Name)
 				if err := pkg.GoInstall(r.options.Path, tool); err != nil {
 					gologger.Error().Msgf("%s: %s", tool.Name, err)
 				}
