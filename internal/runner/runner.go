@@ -101,21 +101,18 @@ func (r *Runner) Run() error {
 			continue
 		}
 		if i, ok := utils.Contains(toolList, toolName); ok {
-			tool := getTool(toolName, toolList)
 			if err := pkg.Install(r.options.Path, toolList[i]); err != nil {
 				if errors.Is(err, types.ErrIsInstalled) {
 					gologger.Info().Msgf("%s: %s", toolName, err)
 				} else {
 					gologger.Error().Msgf("error while installing %s: %s", toolName, err)
 					gologger.Info().Msgf("trying to install %s using go install", toolName)
-					if err := fallbackGoInstall(tool); err != nil {
-						gologger.Error().Msgf("error while installing %s using go install: %s", toolName, err)
-					} else {
-						gologger.Info().Msgf("successfully installed %s using go install", toolName)
+					if err := pkg.GoInstall(r.options.Path, toolList[i]); err != nil {
+						gologger.Error().Msgf("%s: %s", toolName, err)
 					}
 				}
 			}
-			printRequirementInfo(tool)
+			printRequirementInfo(toolList[i])
 		} else {
 			gologger.Error().Msgf("error while installing %s: %s not found in the list", toolName, toolName)
 		}
@@ -158,16 +155,7 @@ func (r *Runner) Run() error {
 	return nil
 }
 
-func fallbackGoInstall(tool *types.Tool) error {
-	cmd := exec.Command("go", "install", "-v", fmt.Sprintf("github.com/projectdiscovery/%s/%s", tool.Name, tool.GoInstallPath))
-	cmd.Env = append(os.Environ(), "GOBIN="+defaultPath)
-	if output, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("go install failed for %s: %s", tool.Name, string(output))
-	}
-	return nil
-}
-
-func printRequirementInfo(tool *types.Tool) {
+func printRequirementInfo(tool types.Tool) {
 	specs := getSpecs(tool)
 
 	printTitle := true
@@ -200,7 +188,7 @@ func getFormattedInstruction(spec types.ToolRequirementSpecification) string {
 	return strings.Replace(spec.Instruction, "$CMD", spec.Command, 1)
 }
 
-func getSpecs(tool *types.Tool) []types.ToolRequirementSpecification {
+func getSpecs(tool types.Tool) []types.ToolRequirementSpecification {
 	var specs []types.ToolRequirementSpecification
 	for _, requirement := range tool.Requirements {
 		if requirement.OS == runtime.GOOS {
