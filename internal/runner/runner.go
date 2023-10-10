@@ -15,6 +15,7 @@ import (
 	"github.com/projectdiscovery/pdtm/pkg/types"
 	"github.com/projectdiscovery/pdtm/pkg/utils"
 	errorutil "github.com/projectdiscovery/utils/errors"
+	osutils "github.com/projectdiscovery/utils/os"
 	stringsutil "github.com/projectdiscovery/utils/strings"
 	"github.com/projectdiscovery/utils/syscallutil"
 )
@@ -264,7 +265,29 @@ func getTool(toolName string, tools []types.Tool) *types.Tool {
 }
 
 func requirementSatisfied(requirementName string) bool {
+	if strings.HasPrefix(requirementName, "lib") {
+		libNames := appendLibExtensionForOS(requirementName)
+		for _, libName := range libNames {
+			_, sysErr := syscallutil.LoadLibrary(libName)
+			if sysErr == nil {
+				return true
+			}
+		}
+		return false
+	}
 	_, execErr := exec.LookPath(requirementName)
-	_, sysErr := syscallutil.LoadLibrary(requirementName)
-	return sysErr == nil || execErr == nil
+	return execErr == nil
+}
+
+func appendLibExtensionForOS(lib string) []string {
+	switch {
+	case osutils.IsWindows():
+		return []string{fmt.Sprintf("%s.dll", lib), lib}
+	case osutils.IsLinux():
+		return []string{fmt.Sprintf("%s.so", lib), lib}
+	case osutils.IsOSX():
+		return []string{fmt.Sprintf("%s.dylib", lib), lib}
+	default:
+		return []string{lib}
+	}
 }
