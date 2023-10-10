@@ -15,6 +15,7 @@ import (
 	"github.com/projectdiscovery/pdtm/pkg/types"
 	"github.com/projectdiscovery/pdtm/pkg/utils"
 	errorutil "github.com/projectdiscovery/utils/errors"
+	osutils "github.com/projectdiscovery/utils/os"
 	stringsutil "github.com/projectdiscovery/utils/strings"
 	"github.com/projectdiscovery/utils/syscallutil"
 )
@@ -264,12 +265,12 @@ func requirementSatisfied(requirementName string) bool {
 }
 
 func appendLibExtensionForOS(lib string) []string {
-	switch runtime.GOOS {
-	case "windows":
+	switch {
+	case osutils.IsWindows():
 		return []string{fmt.Sprintf("%s.dll", lib), lib}
-	case "linux":
+	case osutils.IsLinux():
 		return []string{fmt.Sprintf("%s.so", lib), lib}
-	case "darwin":
+	case osutils.IsOSX():
 		return []string{fmt.Sprintf("%s.dylib", lib), lib}
 	default:
 		return []string{lib}
