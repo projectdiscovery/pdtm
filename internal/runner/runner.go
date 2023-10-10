@@ -101,7 +101,7 @@ func (r *Runner) Run() error {
 		}
 		if i, ok := utils.Contains(toolList, toolName); ok {
 			tool := toolList[i]
-			if tool.InstallType == types.Go {
+			if tool.InstallType == types.Go && isGoInstalled() {
 				if err := pkg.GoInstall(r.options.Path, tool); err != nil {
 					gologger.Error().Msgf("%s: %s", tool.Name, err)
 				}
@@ -161,6 +161,14 @@ func (r *Runner) Run() error {
 		return r.ListToolsAndEnv(toolList)
 	}
 	return nil
+}
+
+func isGoInstalled() bool {
+	cmd := exec.Command("go", "version")
+	if err := cmd.Run(); err != nil {
+		return false
+	}
+	return true
 }
 
 func printRequirementInfo(tool types.Tool) {
