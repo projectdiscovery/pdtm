@@ -10,13 +10,15 @@ updates:
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     target-branch: "dev"
     commit-message:
       prefix: "chore"
       include: "scope"
     labels:
       - "Type: Maintenance"
+    allow:
+      - dependency-name: "github.com/projectdiscovery/*"
 
 #  # Maintain dependencies for GitHub Actions
 #  - package-ecosystem: "github-actions"
