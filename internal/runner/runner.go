@@ -15,6 +15,7 @@ import (
 	"github.com/projectdiscovery/pdtm/pkg/types"
 	"github.com/projectdiscovery/pdtm/pkg/utils"
 	errorutil "github.com/projectdiscovery/utils/errors"
+	osutils "github.com/projectdiscovery/utils/os"
 	stringsutil "github.com/projectdiscovery/utils/strings"
 	"github.com/projectdiscovery/utils/syscallutil"
 )
@@ -95,20 +96,31 @@ func (r *Runner) Run() error {
 	gologger.Verbose().Msgf("using path %s", r.options.Path)
 
 	for _, toolName := range r.options.Install {
-
 		if !path.IsSubPath(homeDir, r.options.Path) {
 			gologger.Error().Msgf("skipping install outside home folder: %s", toolName)
 			continue
 		}
 		if i, ok := utils.Contains(toolList, toolName); ok {
-			if err := pkg.Install(r.options.Path, toolList[i]); err != nil {
-				if err == types.ErrIsInstalled {
-					gologger.Info().Msgf("%s: %s", toolName, err)
+			tool := toolList[i]
+			if tool.InstallType == types.Go && isGoInstalled() {
+				if err := pkg.GoInstall(r.options.Path, tool); err != nil {
+					gologger.Error().Msgf("%s: %s", tool.Name, err)
+				}
+				printRequirementInfo(tool)
+				continue
+			}
+
+			if err := pkg.Install(r.options.Path, tool); err != nil {
+				if errors.Is(err, types.ErrIsInstalled) {
+					gologger.Info().Msgf("%s: %s", tool.Name, err)
 				} else {
-					gologger.Error().Msgf("error while installing %s: %s", toolName, err)
+					gologger.Error().Msgf("error while installing %s: %s", tool.Name, err)
+					gologger.Info().Msgf("trying to install %s using go install", tool.Name)
+					if err := pkg.GoInstall(r.options.Path, tool); err != nil {
+						gologger.Error().Msgf("%s: %s", tool.Name, err)
+					}
 				}
 			}
-			tool := getTool(toolName, toolList)
 			printRequirementInfo(tool)
 		} else {
 			gologger.Error().Msgf("error while installing %s: %s not found in the list", toolName, toolName)
@@ -152,7 +164,15 @@ func (r *Runner) Run() error {
 	return nil
 }
 
-func printRequirementInfo(tool *types.Tool) {
+func isGoInstalled() bool {
+	cmd := exec.Command("go", "version")
+	if err := cmd.Run(); err != nil {
+		return false
+	}
+	return true
+}
+
+func printRequirementInfo(tool types.Tool) {
 	specs := getSpecs(tool)
 
 	printTitle := true
@@ -185,7 +205,7 @@ func getFormattedInstruction(spec types.ToolRequirementSpecification) string {
 	return strings.Replace(spec.Instruction, "$CMD", spec.Command, 1)
 }
 
-func getSpecs(tool *types.Tool) []types.ToolRequirementSpecification {
+func getSpecs(tool types.Tool) []types.ToolRequirementSpecification {
 	var specs []types.ToolRequirementSpecification
 	for _, requirement := range tool.Requirements {
 		if requirement.OS == runtime.GOOS {
@@ -239,17 +259,30 @@ func (r *Runner) ListToolsAndEnv(tools []types.Tool) error {
 // Close the runner instance
 func (r *Runner) Close() {}
 
-func getTool(toolName string, tools []types.Tool) *types.Tool {
-	for _, tool := range tools {
-		if toolName == tool.Name {
-			return &tool
+func requirementSatisfied(requirementName string) bool {
+	if strings.HasPrefix(requirementName, "lib") {
+		libNames := appendLibExtensionForOS(requirementName)
+		for _, libName := range libNames {
+			_, sysErr := syscallutil.LoadLibrary(libName)
+			if sysErr == nil {
+				return true
+			}
 		}
+		return false
 	}
-	return nil
+	_, execErr := exec.LookPath(requirementName)
+	return execErr == nil
 }
 
-func requirementSatisfied(requirementName string) bool {
-	_, execErr := exec.LookPath(requirementName)
-	_, sysErr := syscallutil.LoadLibrary(requirementName)
-	return sysErr == nil || execErr == nil
+func appendLibExtensionForOS(lib string) []string {
+	switch {
+	case osutils.IsWindows():
+		return []string{fmt.Sprintf("%s.dll", lib), lib}
+	case osutils.IsLinux():
+		return []string{fmt.Sprintf("%s.so", lib), lib}
+	case osutils.IsOSX():
+		return []string{fmt.Sprintf("%s.dylib", lib), lib}
+	default:
+		return []string{lib}
+	}
 }

@@ -3,15 +3,18 @@ changelog:
     authors:
       - dependabot
   categories:
-    - title: 🎉 Features
+    - title: 🎉 New Features
       labels:
         - "Type: Enhancement"
-    - title: 🐞 Bugs
+
+    - title: 🐞 Bugs Fixes
       labels:
-        - "Type: Bug" 
+        - "Type: Bug"
+
     - title: 🔨 Maintenance
       labels:
-        - "Type: Maintenance" 
+        - "Type: Maintenance"
+
     - title: Other Changes
       labels:
         - "*"

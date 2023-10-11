@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -38,6 +39,21 @@ func Install(path string, tool types.Tool) error {
 		return err
 	}
 	gologger.Info().Msgf("installed %s %s (%s)", tool.Name, version, au.BrightGreen("latest").String())
+	return nil
+}
+
+// GoInstall installs given tool at path
+func GoInstall(path string, tool types.Tool) error {
+	if _, exists := ospath.GetExecutablePath(path, tool.Name); exists {
+		return types.ErrIsInstalled
+	}
+	gologger.Info().Msgf("installing %s with go install...", tool.Name)
+	cmd := exec.Command("go", "install", "-v", fmt.Sprintf("github.com/projectdiscovery/%s/%s", tool.Name, tool.GoInstallPath))
+	cmd.Env = append(os.Environ(), "GOBIN="+path)
+	if output, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("go install failed %s", string(output))
+	}
+	gologger.Info().Msgf("installed %s %s (%s)", tool.Name, tool.Version, au.BrightGreen("latest").String())
 	return nil
 }
 

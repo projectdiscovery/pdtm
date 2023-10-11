@@ -6,13 +6,13 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"runtime"
 	"strings"
 
 	"github.com/logrusorgru/aurora/v4"
 	"github.com/projectdiscovery/pdtm/pkg/path"
 	"github.com/projectdiscovery/pdtm/pkg/types"
 	"github.com/projectdiscovery/pdtm/pkg/version"
+	updateutils "github.com/projectdiscovery/utils/update"
 )
 
 var host = getEnv("PDTM_SERVER", "https://api.pdtm.sh")
@@ -25,13 +25,6 @@ func getEnv(key, defaultValue string) string {
 	return value
 }
 
-var (
-	// Get current OS name, architecture, and Go version
-	osName    = runtime.GOOS
-	osArch    = runtime.GOARCH
-	goVersion = runtime.Version()
-)
-
 // configure aurora for logging
 var au = aurora.New(aurora.WithColors(true))
 
@@ -39,7 +32,7 @@ func FetchToolList() ([]types.Tool, error) {
 	tools := make([]types.Tool, 0)
 
 	// Create the request URL with query parameters
-	reqURL := fmt.Sprintf("%s/api/v1/tools/?os=%s&arch=%s&go_version=%s", host, osName, osArch, goVersion)
+	reqURL := fmt.Sprintf("%s/api/v1/tools/?%s", host, updateutils.GetpdtmParams(""))
 
 	resp, err := http.Get(reqURL)
 	if err != nil {
@@ -64,7 +57,7 @@ func FetchToolList() ([]types.Tool, error) {
 func fetchTool(toolName string) (types.Tool, error) {
 	var tool types.Tool
 	// Create the request URL to get tool
-	reqURL := fmt.Sprintf("%s/api/v1/tools/%s?os=%s&arch=%s&go_version=%s", host, toolName, osName, osArch, goVersion)
+	reqURL := fmt.Sprintf("%s/api/v1/tools/%s?%s", host, toolName, updateutils.GetpdtmParams(""))
 	resp, err := http.Get(reqURL)
 	if err != nil {
 		return tool, err

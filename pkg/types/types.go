@@ -13,12 +13,21 @@ var (
 )
 
 type Tool struct {
-	Name         string            `json:"name"`
-	Repo         string            `json:"repo"`
-	Version      string            `json:"version"`
-	Requirements []ToolRequirement `json:"requirements"`
-	Assets       map[string]string `json:"assets"`
+	Name          string            `json:"name"`
+	Repo          string            `json:"repo"`
+	Version       string            `json:"version"`
+	GoInstallPath string            `json:"go_install_path" yaml:"go_install_path"`
+	Requirements  []ToolRequirement `json:"requirements"`
+	Assets        map[string]string `json:"assets"`
+	InstallType   InstallType       `json:"install_type" yaml:"install_type"`
 }
+
+type InstallType string
+
+const (
+	Binary InstallType = "binary"
+	Go     InstallType = "go"
+)
 
 type ToolRequirement struct {
 	OS            string                         `json:"os"`
