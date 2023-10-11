@@ -51,7 +51,7 @@ jobs:
 
       - name: Checking tools existence
         run: |
-          go run . | grep -vz "not installed"
+          go run . | grep -v "not installed"
         working-directory: cmd/pdtm/
 
       - name: Update Run - Update All The Tools

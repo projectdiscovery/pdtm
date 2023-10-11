@@ -96,23 +96,28 @@ func (r *Runner) Run() error {
 	gologger.Verbose().Msgf("using path %s", r.options.Path)
 
 	for _, toolName := range r.options.Install {
-
 		if !path.IsSubPath(homeDir, r.options.Path) {
 			gologger.Error().Msgf("skipping install outside home folder: %s", toolName)
 			continue
 		}
 		if i, ok := utils.Contains(toolList, toolName); ok {
-			tool := getTool(toolName, toolList)
-			if err := pkg.Install(r.options.Path, toolList[i]); err != nil {
+			tool := toolList[i]
+			if tool.InstallType == types.Go && isGoInstalled() {
+				if err := pkg.GoInstall(r.options.Path, tool); err != nil {
+					gologger.Error().Msgf("%s: %s", tool.Name, err)
+				}
+				printRequirementInfo(tool)
+				continue
+			}
+
+			if err := pkg.Install(r.options.Path, tool); err != nil {
 				if errors.Is(err, types.ErrIsInstalled) {
-					gologger.Info().Msgf("%s: %s", toolName, err)
+					gologger.Info().Msgf("%s: %s", tool.Name, err)
 				} else {
-					gologger.Error().Msgf("error while installing %s: %s", toolName, err)
-					gologger.Info().Msgf("trying to install %s using go install", toolName)
-					if err := fallbackGoInstall(tool); err != nil {
-						gologger.Error().Msgf("error while installing %s using go install: %s", toolName, err)
-					} else {
-						gologger.Info().Msgf("successfully installed %s using go install", toolName)
+					gologger.Error().Msgf("error while installing %s: %s", tool.Name, err)
+					gologger.Info().Msgf("trying to install %s using go install", tool.Name)
+					if err := pkg.GoInstall(r.options.Path, tool); err != nil {
+						gologger.Error().Msgf("%s: %s", tool.Name, err)
 					}
 				}
 			}
@@ -159,16 +164,15 @@ func (r *Runner) Run() error {
 	return nil
 }
 
-func fallbackGoInstall(tool *types.Tool) error {
-	cmd := exec.Command("go", "install", "-v", fmt.Sprintf("github.com/projectdiscovery/%s/%s", tool.Name, tool.GoInstallPath))
-	cmd.Env = append(os.Environ(), "GOBIN="+defaultPath)
-	if output, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("go install failed for %s: %s", tool.Name, string(output))
+func isGoInstalled() bool {
+	cmd := exec.Command("go", "version")
+	if err := cmd.Run(); err != nil {
+		return false
 	}
-	return nil
+	return true
 }
 
-func printRequirementInfo(tool *types.Tool) {
+func printRequirementInfo(tool types.Tool) {
 	specs := getSpecs(tool)
 
 	printTitle := true
@@ -201,7 +205,7 @@ func getFormattedInstruction(spec types.ToolRequirementSpecification) string {
 	return strings.Replace(spec.Instruction, "$CMD", spec.Command, 1)
 }
 
-func getSpecs(tool *types.Tool) []types.ToolRequirementSpecification {
+func getSpecs(tool types.Tool) []types.ToolRequirementSpecification {
 	var specs []types.ToolRequirementSpecification
 	for _, requirement := range tool.Requirements {
 		if requirement.OS == runtime.GOOS {
@@ -254,15 +258,6 @@ func (r *Runner) ListToolsAndEnv(tools []types.Tool) error {
 
 // Close the runner instance
 func (r *Runner) Close() {}
-
-func getTool(toolName string, tools []types.Tool) *types.Tool {
-	for _, tool := range tools {
-		if toolName == tool.Name {
-			return &tool
-		}
-	}
-	return nil
-}
 
 func requirementSatisfied(requirementName string) bool {
 	if strings.HasPrefix(requirementName, "lib") {
