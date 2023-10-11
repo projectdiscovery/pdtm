@@ -4,14 +4,13 @@ go 1.20
 
 require (
 	github.com/charmbracelet/glamour v0.6.0
-	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/projectdiscovery/goflags v0.1.11
 	github.com/projectdiscovery/gologger v1.1.11
 	github.com/projectdiscovery/utils v0.0.56
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/oauth2 v0.11.0
-	golang.org/x/sys v0.11.0
+	golang.org/x/sys v0.13.0
 )
 
 require (
@@ -22,6 +21,7 @@ require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/cheggaaa/pb/v3 v3.1.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/denisbrodbeck/machineid v1.0.1 // indirect
 	github.com/dlclark/regexp2 v1.8.1 // indirect
 	github.com/ebitengine/purego v0.4.0 // indirect
 	github.com/fatih/color v1.15.0 // indirect
