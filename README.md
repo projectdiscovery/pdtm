@@ -69,9 +69,10 @@ CONFIG:
    -bp, -binary-path string  custom location to download project binary (default "$HOME/.pdtm/go/bin")
 
 INSTALL:
-   -i, -install string[]  install single or multiple project by name (comma separated)
-   -ia, -install-all      install all the projects
-   -ip, -install-path     append path to PATH environment variables
+   -i, -install string[]   install single or multiple project by name (comma separated)
+   -ia, -install-all       install all the projects
+   -ip, -install-path      append path to PATH environment variables
+   -igp, -install-go-path  append GOBIN/GOPATH to PATH environment variables
 
 UPDATE:
    -u, -update string[]         update single or multiple project by name (comma separated)

@@ -43,6 +43,19 @@ func (r *Runner) Run() error {
 		}
 	}
 
+	if r.options.SetGoPath {
+		goBinEnvVar, goPathEnvVar := getGoEnv("GOBIN"), getGoEnv("GOPATH")
+		goEnvVar := goBinEnvVar
+		if goEnvVar == "" {
+			goEnvVar = goPathEnvVar
+		}
+		if goEnvVar != "" {
+			if err := path.SetENV(goEnvVar); err != nil {
+				return errorutil.NewWithErr(err).Msgf(`Failed to set path: %s. Add it to $PATH and run again`, goEnvVar)
+			}
+		}
+	}
+
 	if r.options.UnSetPath {
 		if err := path.UnsetENV(r.options.Path); err != nil {
 			return errorutil.NewWithErr(err).Msgf(`Failed to unset path: %s. Remove it from $PATH and run again`, r.options.Path)
@@ -162,6 +175,15 @@ func (r *Runner) Run() error {
 		return r.ListToolsAndEnv(toolList)
 	}
 	return nil
+}
+
+func getGoEnv(key string) string {
+	cmd := exec.Command("go", "env", key)
+	output, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(output))
 }
 
 func isGoInstalled() bool {
