@@ -36,6 +36,7 @@ type Options struct {
 	Path       string
 	NoColor    bool
 	SetPath    bool
+	SetGoPath  bool
 	UnSetPath  bool
 
 	Install goflags.StringSlice
@@ -70,6 +71,7 @@ func ParseOptions() *Options {
 		flagSet.StringSliceVarP(&options.Install, "install", "i", nil, "install single or multiple project by name (comma separated)", goflags.NormalizedStringSliceOptions),
 		flagSet.BoolVarP(&options.InstallAll, "install-all", "ia", false, "install all the projects"),
 		flagSet.BoolVarP(&options.SetPath, "install-path", "ip", false, "append path to PATH environment variables"),
+		flagSet.BoolVarP(&options.SetGoPath, "install-go-path", "igp", false, "append GOBIN/GOPATH to PATH environment variables"),
 	)
 
 	flagSet.CreateGroup("update", "Update",
