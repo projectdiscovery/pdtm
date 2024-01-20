@@ -10,7 +10,7 @@ require (
 	github.com/projectdiscovery/utils v0.0.57
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/oauth2 v0.13.0
-	golang.org/x/sys v0.13.0
+	golang.org/x/sys v0.15.0
 )
 
 require (
@@ -40,7 +40,7 @@ require (
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/yuin/goldmark v1.5.4 // indirect
 	github.com/yuin/goldmark-emoji v1.0.1 // indirect
-	golang.org/x/crypto v0.14.0 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
 )
 
 require (
