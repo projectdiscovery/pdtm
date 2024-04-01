@@ -6,8 +6,7 @@ This privacy policy (the "Policy") is intended to inform you of the types of inf
 
 We collect the following types of information from users of API:
 
-- OS name
-- OS architecture
+- OS / Vendor / Arch
 - Go version
 - MachineID ([Hashed](https://github.com/denisbrodbeck/machineid#function-protectedidappid-string-string-error))
 - IP address
@@ -32,4 +31,4 @@ We reserve the right to change this Policy at any time. If we make changes to th
 
 If you have any questions or concerns about this Policy, please contact us at contact@projectdiscovery.io
 
-Last updated: September 23, 2023
+Last updated: April 1, 2024
