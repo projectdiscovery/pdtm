@@ -7,7 +7,7 @@ require (
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/projectdiscovery/goflags v0.1.46
 	github.com/projectdiscovery/gologger v1.1.12
-	github.com/projectdiscovery/utils v0.0.86
+	github.com/projectdiscovery/utils v0.0.88
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/oauth2 v0.13.0
 	golang.org/x/sys v0.17.0
@@ -27,6 +27,7 @@ require (
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/google/go-github/v30 v30.1.0 // indirect
+	github.com/google/uuid v1.3.1 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/klauspost/pgzip v1.2.5 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
@@ -55,6 +56,7 @@ require (
 	github.com/yuin/goldmark v1.5.4 // indirect
 	github.com/yuin/goldmark-emoji v1.0.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
+	github.com/zcalusic/sysinfo v1.0.2 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
 )
 
