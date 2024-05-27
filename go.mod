@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/charmbracelet/glamour v0.6.0
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/projectdiscovery/goflags v0.1.53
+	github.com/projectdiscovery/goflags v0.1.54
 	github.com/projectdiscovery/gologger v1.1.12
 	github.com/projectdiscovery/utils v0.1.0
 	github.com/stretchr/testify v1.9.0
@@ -27,6 +27,7 @@ require (
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/google/go-github/v30 v30.1.0 // indirect
+	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.3.1 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/klauspost/pgzip v1.2.5 // indirect
