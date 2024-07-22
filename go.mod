@@ -7,7 +7,7 @@ require (
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/projectdiscovery/goflags v0.1.60
 	github.com/projectdiscovery/gologger v1.1.16
-	github.com/projectdiscovery/utils v0.2.1
+	github.com/projectdiscovery/utils v0.2.2
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/oauth2 v0.13.0
 	golang.org/x/sys v0.18.0
@@ -29,7 +29,7 @@ require (
 	github.com/google/go-github/v30 v30.1.0 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.3.1 // indirect
-	github.com/klauspost/compress v1.16.7 // indirect
+	github.com/klauspost/compress v1.17.4 // indirect
 	github.com/klauspost/pgzip v1.2.5 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
