@@ -7,7 +7,7 @@ require (
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/projectdiscovery/goflags v0.1.60
 	github.com/projectdiscovery/gologger v1.1.16
-	github.com/projectdiscovery/utils v0.2.2
+	github.com/projectdiscovery/utils v0.2.3
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/oauth2 v0.13.0
 	golang.org/x/sys v0.18.0
