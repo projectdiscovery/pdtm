@@ -94,6 +94,11 @@ func write(path string, cur []string) error {
 	return nil
 }
 
+func paths() []string {
+	configuredPaths, _ := getPathsFromRegistry()
+	return configuredPaths
+}
+
 func getPathsFromRegistry() ([]string, error) {
 	k, err := registry.OpenKey(registry.CURRENT_USER, `Environment`, registry.QUERY_VALUE)
 	if err != nil {
