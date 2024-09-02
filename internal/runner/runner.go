@@ -261,7 +261,7 @@ func FetchFromCache() ([]types.Tool, error) {
 
 // ListToolsAndEnv prints the list of tools
 func (r *Runner) ListToolsAndEnv(tools []types.Tool) error {
-	gologger.Info().Msgf(path.GetOsData() + "\n")
+	gologger.Info().Msgf("%s\n", path.GetOsData())
 	gologger.Info().Msgf("Path to download project binary: %s\n", r.options.Path)
 	var fmtMsg string
 	if path.IsSet(r.options.Path) {

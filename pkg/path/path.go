@@ -10,11 +10,6 @@ import (
 	fileutil "github.com/projectdiscovery/utils/file"
 )
 
-type Config struct {
-	shellName string
-	rcFile    string
-}
-
 func IsSet(path string) bool {
 	ok, _ := isSet(path)
 	return ok
