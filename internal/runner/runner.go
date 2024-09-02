@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"runtime"
 	"strings"
 
 	"github.com/projectdiscovery/gologger"
@@ -15,9 +14,7 @@ import (
 	"github.com/projectdiscovery/pdtm/pkg/types"
 	"github.com/projectdiscovery/pdtm/pkg/utils"
 	errorutil "github.com/projectdiscovery/utils/errors"
-	osutils "github.com/projectdiscovery/utils/os"
 	stringsutil "github.com/projectdiscovery/utils/strings"
-	"github.com/projectdiscovery/utils/syscallutil"
 )
 
 var excludedToolList = []string{"nuclei-templates"}
@@ -119,7 +116,6 @@ func (r *Runner) Run() error {
 				if err := pkg.GoInstall(r.options.Path, tool); err != nil {
 					gologger.Error().Msgf("%s: %s", tool.Name, err)
 				}
-				printRequirementInfo(tool)
 				continue
 			}
 
@@ -134,7 +130,6 @@ func (r *Runner) Run() error {
 					}
 				}
 			}
-			printRequirementInfo(tool)
 		} else {
 			gologger.Error().Msgf("error while installing %s: %s not found in the list", toolName, toolName)
 		}
@@ -194,49 +189,6 @@ func isGoInstalled() bool {
 	return true
 }
 
-func printRequirementInfo(tool types.Tool) {
-	specs := getSpecs(tool)
-
-	printTitle := true
-	stringBuilder := &strings.Builder{}
-	for _, spec := range specs {
-		if requirementSatisfied(spec.Name) {
-			continue
-		}
-		if printTitle {
-			stringBuilder.WriteString(fmt.Sprintf("%s\n", au.Bold(tool.Name+" requirements:").String()))
-			printTitle = false
-		}
-		instruction := getFormattedInstruction(spec)
-		isRequired := getRequirementStatus(spec)
-		stringBuilder.WriteString(fmt.Sprintf("%s %s\n", isRequired, instruction))
-	}
-	if stringBuilder.Len() > 0 {
-		gologger.Info().Msgf("%s", stringBuilder.String())
-	}
-}
-
-func getRequirementStatus(spec types.ToolRequirementSpecification) string {
-	if spec.Required {
-		return au.Yellow("required").String()
-	}
-	return au.BrightGreen("optional").String()
-}
-
-func getFormattedInstruction(spec types.ToolRequirementSpecification) string {
-	return strings.Replace(spec.Instruction, "$CMD", spec.Command, 1)
-}
-
-func getSpecs(tool types.Tool) []types.ToolRequirementSpecification {
-	var specs []types.ToolRequirementSpecification
-	for _, requirement := range tool.Requirements {
-		if requirement.OS == runtime.GOOS {
-			specs = append(specs, requirement.Specification...)
-		}
-	}
-	return specs
-}
-
 // UpdateCache creates/updates cache file
 func UpdateCache(toolList []types.Tool) error {
 	b, err := json.Marshal(toolList)
@@ -280,31 +232,3 @@ func (r *Runner) ListToolsAndEnv(tools []types.Tool) error {
 
 // Close the runner instance
 func (r *Runner) Close() {}
-
-func requirementSatisfied(requirementName string) bool {
-	if strings.HasPrefix(requirementName, "lib") {
-		libNames := appendLibExtensionForOS(requirementName)
-		for _, libName := range libNames {
-			_, sysErr := syscallutil.LoadLibrary(libName)
-			if sysErr == nil {
-				return true
-			}
-		}
-		return false
-	}
-	_, execErr := exec.LookPath(requirementName)
-	return execErr == nil
-}
-
-func appendLibExtensionForOS(lib string) []string {
-	switch {
-	case osutils.IsWindows():
-		return []string{fmt.Sprintf("%s.dll", lib), lib}
-	case osutils.IsLinux():
-		return []string{fmt.Sprintf("%s.so", lib), lib}
-	case osutils.IsOSX():
-		return []string{fmt.Sprintf("%s.dylib", lib), lib}
-	default:
-		return []string{lib}
-	}
-}
