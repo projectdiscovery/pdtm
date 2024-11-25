@@ -6,7 +6,7 @@ require (
 	github.com/charmbracelet/glamour v0.8.0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/projectdiscovery/goflags v0.1.65
-	github.com/projectdiscovery/gologger v1.1.32
+	github.com/projectdiscovery/gologger v1.1.33
 	github.com/projectdiscovery/utils v0.2.19
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/oauth2 v0.13.0
