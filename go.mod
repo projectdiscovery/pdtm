@@ -7,10 +7,10 @@ require (
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/projectdiscovery/goflags v0.1.65
 	github.com/projectdiscovery/gologger v1.1.35
-	github.com/projectdiscovery/utils v0.4.1
+	github.com/projectdiscovery/utils v0.4.2
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/oauth2 v0.13.0
-	golang.org/x/sys v0.25.0
+	golang.org/x/sys v0.28.0
 )
 
 require (
@@ -59,9 +59,9 @@ require (
 	github.com/yuin/goldmark-emoji v1.0.3 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	github.com/zcalusic/sysinfo v1.0.2 // indirect
-	golang.org/x/crypto v0.27.0 // indirect
-	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/term v0.24.0 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/term v0.27.0 // indirect
 )
 
 require (
