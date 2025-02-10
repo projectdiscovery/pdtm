@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/charmbracelet/glamour v0.8.0
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/projectdiscovery/goflags v0.1.70
+	github.com/projectdiscovery/goflags v0.1.71
 	github.com/projectdiscovery/gologger v1.1.44
 	github.com/projectdiscovery/utils v0.4.9
 	github.com/stretchr/testify v1.9.0
