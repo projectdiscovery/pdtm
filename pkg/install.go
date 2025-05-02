@@ -114,7 +114,11 @@ loop:
 		return "", err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			gologger.Warning().Msgf("Error closing response body: %s", err)
+		}
+	}()
 	if resp.StatusCode != 200 {
 		return "", err
 	}
@@ -167,7 +171,11 @@ func downloadTar(reader io.Reader, toolName, path string) error {
 			if err != nil {
 				return err
 			}
-			defer dstFile.Close()
+			defer func() {
+				if err := dstFile.Close(); err != nil {
+					gologger.Warning().Msgf("Error closing file: %s", err)
+				}
+			}()
 			// copy the file data from the archive
 			_, err = io.Copy(dstFile, tarReader)
 			if err != nil {
@@ -224,8 +232,12 @@ func downloadZip(reader io.Reader, toolName, path string) error {
 			return err
 		}
 
-		dstFile.Close()
-		fileInArchive.Close()
+		if err := dstFile.Close(); err != nil {
+			gologger.Warning().Msgf("Error closing file: %s", err)
+		}
+		if err := fileInArchive.Close(); err != nil {
+			gologger.Warning().Msgf("Error closing file in archive: %s", err)
+		}
 	}
 	return nil
 }
@@ -240,12 +252,12 @@ func printRequirementInfo(tool types.Tool) {
 			continue
 		}
 		if printTitle {
-			stringBuilder.WriteString(fmt.Sprintf("%s\n", au.Bold(tool.Name+" requirements:").String()))
+			fmt.Fprintf(stringBuilder, "%s\n", au.Bold(tool.Name+" requirements:").String())
 			printTitle = false
 		}
 		instruction := getFormattedInstruction(spec)
 		isRequired := getRequirementStatus(spec)
-		stringBuilder.WriteString(fmt.Sprintf("%s %s\n", isRequired, instruction))
+		fmt.Fprintf(stringBuilder, "%s %s\n", isRequired, instruction)
 	}
 	if stringBuilder.Len() > 0 {
 		gologger.Info().Msgf("%s", stringBuilder.String())
