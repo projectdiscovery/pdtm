@@ -38,7 +38,12 @@ func FetchToolList() ([]types.Tool, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			// Just log warning as we're already returning from function
+			fmt.Printf("Error closing response body: %s\n", err)
+		}
+	}()
 
 	if resp.StatusCode == http.StatusOK {
 		body, err := io.ReadAll(resp.Body)
@@ -62,7 +67,12 @@ func fetchTool(toolName string) (types.Tool, error) {
 	if err != nil {
 		return tool, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			// Just log warning as we're already returning from function
+			fmt.Printf("Error closing response body: %s\n", err)
+		}
+	}()
 
 	if resp.StatusCode == http.StatusOK {
 		body, err := io.ReadAll(resp.Body)

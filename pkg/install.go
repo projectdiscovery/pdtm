@@ -21,6 +21,8 @@ import (
 	"github.com/projectdiscovery/gologger"
 	ospath "github.com/projectdiscovery/pdtm/pkg/path"
 	"github.com/projectdiscovery/pdtm/pkg/types"
+	osutils "github.com/projectdiscovery/utils/os"
+	"github.com/projectdiscovery/utils/syscallutil"
 )
 
 var (
@@ -34,6 +36,7 @@ func Install(path string, tool types.Tool) error {
 		return types.ErrIsInstalled
 	}
 	gologger.Info().Msgf("installing %s...", tool.Name)
+	printRequirementInfo(tool)
 	version, err := install(tool, path)
 	if err != nil {
 		return err
@@ -48,6 +51,7 @@ func GoInstall(path string, tool types.Tool) error {
 		return types.ErrIsInstalled
 	}
 	gologger.Info().Msgf("installing %s with go install...", tool.Name)
+	printRequirementInfo(tool)
 	cmd := exec.Command("go", "install", "-v", fmt.Sprintf("github.com/projectdiscovery/%s/%s", tool.Name, tool.GoInstallPath))
 	cmd.Env = append(os.Environ(), "GOBIN="+path)
 	if output, err := cmd.CombinedOutput(); err != nil {
@@ -110,7 +114,11 @@ loop:
 		return "", err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			gologger.Warning().Msgf("Error closing response body: %s", err)
+		}
+	}()
 	if resp.StatusCode != 200 {
 		return "", err
 	}
@@ -163,7 +171,11 @@ func downloadTar(reader io.Reader, toolName, path string) error {
 			if err != nil {
 				return err
 			}
-			defer dstFile.Close()
+			defer func() {
+				if err := dstFile.Close(); err != nil {
+					gologger.Warning().Msgf("Error closing file: %s", err)
+				}
+			}()
 			// copy the file data from the archive
 			_, err = io.Copy(dstFile, tarReader)
 			if err != nil {
@@ -220,8 +232,83 @@ func downloadZip(reader io.Reader, toolName, path string) error {
 			return err
 		}
 
-		dstFile.Close()
-		fileInArchive.Close()
+		if err := dstFile.Close(); err != nil {
+			gologger.Warning().Msgf("Error closing file: %s", err)
+		}
+		if err := fileInArchive.Close(); err != nil {
+			gologger.Warning().Msgf("Error closing file in archive: %s", err)
+		}
 	}
 	return nil
+}
+
+func printRequirementInfo(tool types.Tool) {
+	specs := getSpecs(tool)
+
+	printTitle := true
+	stringBuilder := &strings.Builder{}
+	for _, spec := range specs {
+		if requirementSatisfied(spec.Name) {
+			continue
+		}
+		if printTitle {
+			fmt.Fprintf(stringBuilder, "%s\n", au.Bold(tool.Name+" requirements:").String())
+			printTitle = false
+		}
+		instruction := getFormattedInstruction(spec)
+		isRequired := getRequirementStatus(spec)
+		fmt.Fprintf(stringBuilder, "%s %s\n", isRequired, instruction)
+	}
+	if stringBuilder.Len() > 0 {
+		gologger.Info().Msgf("%s", stringBuilder.String())
+	}
+}
+
+func getRequirementStatus(spec types.ToolRequirementSpecification) string {
+	if spec.Required {
+		return au.Yellow("required").String()
+	}
+	return au.BrightGreen("optional").String()
+}
+
+func getFormattedInstruction(spec types.ToolRequirementSpecification) string {
+	return strings.Replace(spec.Instruction, "$CMD", spec.Command, 1)
+}
+
+func getSpecs(tool types.Tool) []types.ToolRequirementSpecification {
+	var specs []types.ToolRequirementSpecification
+	for _, requirement := range tool.Requirements {
+		if requirement.OS == runtime.GOOS {
+			specs = append(specs, requirement.Specification...)
+		}
+	}
+	return specs
+}
+
+func requirementSatisfied(requirementName string) bool {
+	if strings.HasPrefix(requirementName, "lib") {
+		libNames := appendLibExtensionForOS(requirementName)
+		for _, libName := range libNames {
+			_, sysErr := syscallutil.LoadLibrary(libName)
+			if sysErr == nil {
+				return true
+			}
+		}
+		return false
+	}
+	_, execErr := exec.LookPath(requirementName)
+	return execErr == nil
+}
+
+func appendLibExtensionForOS(lib string) []string {
+	switch {
+	case osutils.IsWindows():
+		return []string{fmt.Sprintf("%s.dll", lib), lib}
+	case osutils.IsLinux():
+		return []string{fmt.Sprintf("%s.so", lib), lib}
+	case osutils.IsOSX():
+		return []string{fmt.Sprintf("%s.dylib", lib), lib}
+	default:
+		return []string{lib}
+	}
 }
