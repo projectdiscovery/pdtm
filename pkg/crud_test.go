@@ -35,7 +35,9 @@ func TestInstall(t *testing.T) {
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
 	require.Nil(t, err)
-	defer os.RemoveAll(pathBin)
+	defer func() {
+		require.NoError(t, os.RemoveAll(pathBin))
+	}()
 
 	// install first time
 	err = Install(pathBin, tool)
@@ -51,7 +53,9 @@ func TestRemove(t *testing.T) {
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
 	require.Nil(t, err)
-	defer os.RemoveAll(pathBin)
+	defer func() {
+		require.NoError(t, os.RemoveAll(pathBin))
+	}()
 
 	// install the tool
 	err = Install(pathBin, tool)
@@ -71,7 +75,9 @@ func TestUpdateSameVersion(t *testing.T) {
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
 	require.Nil(t, err)
-	defer os.RemoveAll(pathBin)
+	defer func() {
+		require.NoError(t, os.RemoveAll(pathBin))
+	}()
 
 	// install the tool
 	err = Install(pathBin, tool)
@@ -87,7 +93,9 @@ func TestUpdateNonExistingTool(t *testing.T) {
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
 	require.Nil(t, err)
-	defer os.RemoveAll(pathBin)
+	defer func() {
+		require.NoError(t, os.RemoveAll(pathBin))
+	}()
 
 	// updating non existing tool should error
 	err = Update(pathBin, tool, true)
@@ -99,7 +107,9 @@ func TestUpdateToolWithoutAssets(t *testing.T) {
 
 	pathBin, err := os.MkdirTemp("", "test-dir")
 	require.Nil(t, err)
-	defer os.RemoveAll(pathBin)
+	defer func() {
+		require.NoError(t, os.RemoveAll(pathBin))
+	}()
 
 	// install the tool
 	err = Install(pathBin, tool)
