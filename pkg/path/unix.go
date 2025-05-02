@@ -24,6 +24,10 @@ var confList = []*Config{
 		shellName: "zsh",
 		rcFile:    ".zshrc",
 	},
+	{
+		shellName: "fish",
+		rcFile:    ".config/fish/config.fish",
+	},
 }
 
 func (c *Config) GetRCFilePath() (string, error) {
@@ -32,6 +36,17 @@ func (c *Config) GetRCFilePath() (string, error) {
 		return "", err
 	}
 	rcFilePath := filepath.Join(home, c.rcFile)
+
+	// For fish, ensure the directory exists
+	if c.shellName == "fish" {
+		configDir := filepath.Dir(rcFilePath)
+		if !fileutil.FolderExists(configDir) {
+			if err := os.MkdirAll(configDir, os.ModePerm); err != nil {
+				return "", fmt.Errorf("failed to create fish config directory %v got %v", configDir, err)
+			}
+		}
+	}
+
 	if fileutil.FileExists(rcFilePath) {
 		return rcFilePath, nil
 	}
@@ -79,7 +94,13 @@ func add(path string) (bool, error) {
 		return false, errorutil.NewWithErr(err).Msgf("add %s to $PATH env", path)
 	}
 
-	script := fmt.Sprintf("export PATH=$PATH:%s\n\n", path)
+	var script string
+	if conf.shellName == "fish" {
+		script = fmt.Sprintf("fish_add_path %s\n\n", path)
+	} else {
+		script = fmt.Sprintf("export PATH=$PATH:%s\n\n", path)
+	}
+
 	return exportToConfig(conf, path, script)
 }
 
@@ -93,8 +114,15 @@ func remove(path string) (bool, error) {
 	if err != nil {
 		return false, errorutil.NewWithErr(err).Msgf("remove %s from $PATH env", path)
 	}
-	pathVars = sliceutil.PruneEqual(pathVars, path)
-	script := fmt.Sprintf("export PATH=%s\n\n", strings.Join(pathVars, ":"))
+
+	var script string
+	if conf.shellName == "fish" {
+		script = fmt.Sprintf("set --erase fish_user_paths[contains $fish_user_paths %s]\n\n", path)
+	} else {
+		pathVars = sliceutil.PruneEqual(pathVars, path)
+		script = fmt.Sprintf("export PATH=%s\n\n", strings.Join(pathVars, ":"))
+	}
+
 	return exportToConfig(conf, path, script)
 }
 
@@ -115,7 +143,11 @@ func exportToConfig(config *Config, path, script string) (bool, error) {
 	lines := strings.Split(strings.TrimSpace(string(b)), "\n")
 	for _, line := range lines {
 		if strings.EqualFold(line, strings.TrimSpace(script)) {
-			gologger.Info().Msgf("Run `source ~/%s` to add %s to $PATH ", config.rcFile, path)
+			if config.shellName == "fish" {
+				gologger.Info().Msgf("Run `source %s` to add %s to $PATH ", rcFilePath, path)
+			} else {
+				gologger.Info().Msgf("Run `source ~/%s` to add %s to $PATH ", config.rcFile, path)
+			}
 			return true, nil
 		}
 	}
@@ -123,6 +155,7 @@ func exportToConfig(config *Config, path, script string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+
 	script = fmt.Sprintf("\n\n# Generated for pdtm. Do not edit.\n%s", script)
 	if _, err := f.Write([]byte(script)); err != nil {
 		return false, err
@@ -130,6 +163,11 @@ func exportToConfig(config *Config, path, script string) (bool, error) {
 	if err := f.Close(); err != nil {
 		return false, err
 	}
-	gologger.Info().Label("WRN").Msgf("Run `source ~/%s` to add $PATH (%s)", config.rcFile, path)
+
+	if config.shellName == "fish" {
+		gologger.Info().Label("WRN").Msgf("Run `source %s` to add $PATH (%s)", rcFilePath, path)
+	} else {
+		gologger.Info().Label("WRN").Msgf("Run `source ~/%s` to add $PATH (%s)", config.rcFile, path)
+	}
 	return true, nil
 }

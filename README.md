@@ -31,7 +31,7 @@
 ## Installation
 
 
-**`pdtm`** requires **go1.19** to install successfully. Run the following command to install the latest version:
+**`pdtm`** requires **go1.24.2** to install successfully. Run the following command to install the latest version:
 
 1. Install using go install -
 
