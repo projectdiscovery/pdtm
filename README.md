@@ -31,7 +31,7 @@
 ## Installation
 
 
-**`pdtm`** requires **go1.24.2** to install successfully. Run the following command to install the latest version:
+**`pdtm`** requires **go1.24.3** to install successfully. Run the following command to install the latest version:
 
 1. Install using go install -
 
@@ -43,7 +43,7 @@ go install -v github.com/projectdiscovery/pdtm/cmd/pdtm@latest
 
 <table>
 <tr>
-<td>  
+<td>
 
 > **Notes**:
 
@@ -52,9 +52,9 @@ go install -v github.com/projectdiscovery/pdtm/cmd/pdtm@latest
 
 </table>
 </tr>
-</td> 
+</td>
 
-## Usage: 
+## Usage:
 
 
 ```console
@@ -97,11 +97,11 @@ DEBUG:
 
 ```console
 $ pdtm -install-all
-                ____          
-     ____  ____/ / /_____ ___ 
+                ____
+     ____  ____/ / /_____ ___
     / __ \/ __  / __/ __ __  \
    / /_/ / /_/ / /_/ / / / / /
-  / .___/\__,_/\__/_/ /_/ /_/ 
+  / .___/\__,_/\__/_/ /_/ /_/
  /_/                          v0.0.1
 
       projectdiscovery.io
@@ -110,7 +110,7 @@ $ pdtm -install-all
 [INF] Installed nuclei v2.6.3
 [INF] Installed naabu v2.6.3
 [INF] Installed dnsx v2.6.3
-``` 
+```
 
 ### Todo
 
