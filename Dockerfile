@@ -1,10 +1,12 @@
 FROM golang:1.24.3-alpine AS builder
-RUN apk add --no-cache git
-RUN go install -v github.com/projectdiscovery/pdtm/cmd/pdtm@latest
+RUN apk add --no-cache git gcc musl-dev
+WORKDIR /app
+COPY . /app
+RUN go mod download
+RUN go build ./cmd/pdtm
 
-FROM alpine:3.21
-RUN apk -U upgrade --no-cache \
-    && apk add --no-cache bind-tools ca-certificates
-COPY --from=builder /go/bin/pdtm /usr/local/bin/
+FROM alpine:latest
+RUN apk add --no-cache bind-tools ca-certificates
+COPY --from=builder /app/pdtm /usr/local/bin/
 
 ENTRYPOINT ["pdtm"]
