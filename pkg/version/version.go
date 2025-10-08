@@ -11,12 +11,13 @@ import (
 	"github.com/projectdiscovery/pdtm/pkg/types"
 )
 
-var RegexVersionNumber = regexp.MustCompile(`(?m)[v\s](\d+\.\d+\.\d+)`)
+var (
+	RegexVersionNumber = regexp.MustCompile(`(?m)[v\s](\d+\.\d+\.\d+)`)
+	versionCommands    = []string{"--version", "version"}
+)
 
 func ExtractInstalledVersion(tool types.Tool, basePath string) (string, error) {
 	toolPath := filepath.Join(basePath, tool.Name)
-
-	versionCommands := []string{"--version", "version"}
 
 	for _, versionCmd := range versionCommands {
 		if version, err := tryVersionCommand(toolPath, versionCmd); err == nil {
