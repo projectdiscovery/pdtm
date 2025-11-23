@@ -92,38 +92,30 @@ DEBUG:
    -nc, -no-color           disable output content coloring (ANSI escape codes)
    -disable-changelog, -dc  disable release changelog in output
 
-
-### Troubleshooting: `naabu` build fails with `pcap.h: No such file or directory`
-
-When `pdtm` installs **naabu** via `go install` (source build), libpcap development headers are required.
-
-**Fix by distro:**
-- **Debian/Ubuntu/Kali**
-  ```bash
-  sudo apt update
-  sudo apt install -y libpcap-dev build-essential
-
-
-**Fix by distro:**
-- **Debian/Ubuntu/Kali**
-  ```bash
-  sudo apt update
-  sudo apt install -y libpcap-dev build-essential
-
-Fedora/RHEL
-
+#### Troubleshooting `naabu` source builds (pcap.h error)
+ When `pdtm` installs **naabu** via `go install` (source build), **libpcap
+development headers** are required. 
+If they’re missing, the build will fail with:
+ ```bash
+fatal error: pcap.h: No such file or directory
+```
+ **Install prerequisites by distro:**
+ - **Debian / Ubuntu / Kali**
+```bash
+sudo apt update
+sudo apt install -y libpcap-dev build-essential
+```
+ - **Fedora / RHEL**
+```bash
 sudo dnf install -y libpcap-devel @development-tools
-
-Arch
-
+```
+ - **Arch Linux**
+```bash
 sudo pacman -S --needed libpcap base-devel
-
-Optional: run naabu without sudo
-
+```
+ **Optional:** Allow `naabu` to run without sudo 
+```bash
 sudo setcap cap_net_raw,cap_net_admin=eip "$(which naabu)"
-
-
-
 
 
 ```
