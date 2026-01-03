@@ -114,7 +114,11 @@ func (r *Runner) Run() error {
 			tool := toolList[i]
 			if tool.InstallType == types.Go && isGoInstalled() {
 				if err := pkg.GoInstall(r.options.Path, tool); err != nil {
-					gologger.Error().Msgf("%s: %s", tool.Name, err)
+					if errors.Is(err, types.ErrIsInstalled) {
+						gologger.Info().Msgf("%s: %s", tool.Name, err)
+					} else {
+						gologger.Error().Msgf("%s: %s", tool.Name, err)
+					}
 				}
 				continue
 			}
@@ -126,7 +130,11 @@ func (r *Runner) Run() error {
 					gologger.Error().Msgf("error while installing %s: %s", tool.Name, err)
 					gologger.Info().Msgf("trying to install %s using go install", tool.Name)
 					if err := pkg.GoInstall(r.options.Path, tool); err != nil {
-						gologger.Error().Msgf("%s: %s", tool.Name, err)
+						if errors.Is(err, types.ErrIsInstalled) {
+							gologger.Info().Msgf("%s: %s", tool.Name, err)
+						} else {
+							gologger.Error().Msgf("%s: %s", tool.Name, err)
+						}
 					}
 				}
 			}
