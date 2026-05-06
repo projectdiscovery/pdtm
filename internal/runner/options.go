@@ -91,6 +91,7 @@ func ParseOptions() *Options {
 		flagSet.BoolVarP(&options.ShowPath, "show-path", "sp", false, "show the current binary path then exit"),
 		flagSet.BoolVar(&options.Version, "version", false, "show version of the project"),
 		flagSet.BoolVarP(&options.Verbose, "verbose", "v", false, "show verbose output"),
+		flagSet.BoolVar(&options.Silent, "silent", false, "silence output"),
 		flagSet.BoolVarP(&options.NoColor, "no-color", "nc", false, "disable output content coloring (ANSI escape codes)"),
 		flagSet.BoolVarP(&options.DisableChangeLog, "dc", "disable-changelog", false, "disable release changelog in output"),
 	)
@@ -104,7 +105,9 @@ func ParseOptions() *Options {
 
 	options.configureOutput()
 
-	showBanner()
+	if !options.Silent {
+		showBanner()
+	}
 
 	if options.Version {
 		gologger.Info().Msgf("Current Version: %s\n", version)
