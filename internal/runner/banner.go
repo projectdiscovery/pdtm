@@ -5,7 +5,10 @@ import (
 	updateutils "github.com/projectdiscovery/utils/update"
 )
 
-const version = "v0.1.3"
+// version is the release version, injected at build time via
+// -X github.com/projectdiscovery/pdtm/internal/runner.version=<tag>.
+// The literal below is only a fallback for plain `go build`.
+var version = "v0.1.5"
 
 var banner = `
                 ____          

@@ -23,6 +23,9 @@ builds:
     - goos: windows
       goarch: 'arm64'
 
+  ldflags:
+    - -s -w -X github.com/projectdiscovery/pdtm/internal/runner.version={{ .Tag }}
+
   binary: '{{ .ProjectName }}'
   main: cmd/{{ .ProjectName }}/{{ .ProjectName }}.go
 
