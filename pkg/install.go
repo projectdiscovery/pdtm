@@ -52,7 +52,7 @@ func GoInstall(path string, tool types.Tool) error {
 	}
 	gologger.Info().Msgf("installing %s with go install...", tool.Name)
 	printRequirementInfo(tool)
-	cmd := exec.Command("go", "install", "-v", fmt.Sprintf("github.com/projectdiscovery/%s/%s", tool.Name, tool.GoInstallPath))
+	cmd := exec.Command("go", "install", "-v", fmt.Sprintf("github.com/projectdiscovery/%s/%s", tool.Repo, tool.GoInstallPath))
 	cmd.Env = append(os.Environ(), "GOBIN="+path)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("go install failed %s", string(output))
