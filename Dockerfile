@@ -1,13 +1,16 @@
-FROM golang:1.25-alpine AS builder
-ARG VERSION
-RUN apk add --no-cache git gcc musl-dev
-WORKDIR /app
-COPY . /app
-RUN go mod download
-RUN go build -ldflags "-s -w ${VERSION:+-X github.com/projectdiscovery/pdtm/internal/runner.version=$VERSION}" ./cmd/pdtm
-
 FROM alpine:latest
-RUN apk add --no-cache bind-tools ca-certificates
-COPY --from=builder /app/pdtm /usr/local/bin/
+
+LABEL org.opencontainers.image.authors="ProjectDiscovery"
+LABEL org.opencontainers.image.description="pdtm is a simple and easy-to-use golang based tool for managing open source projects from ProjectDiscovery."
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.title="pdtm"
+LABEL org.opencontainers.image.url="https://github.com/projectdiscovery/pdtm"
+
+# gcompat: purego (dlopen) makes the amd64/arm64 binaries dynamically linked
+# against the glibc loader even with CGO_ENABLED=0.
+RUN apk add --no-cache bind-tools ca-certificates gcompat
+
+ARG TARGETPLATFORM
+COPY $TARGETPLATFORM/pdtm /usr/local/bin/
 
 ENTRYPOINT ["pdtm"]
