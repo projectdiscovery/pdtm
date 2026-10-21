@@ -1,8 +1,6 @@
 module github.com/projectdiscovery/pdtm
 
-go 1.25.0
-
-toolchain go1.26.10
+go 1.26.10
 
 require (
 	github.com/charmbracelet/glamour v0.10.0
