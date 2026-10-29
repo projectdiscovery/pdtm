@@ -216,7 +216,7 @@ func FetchFromCache() ([]types.Tool, error) {
 	if err := json.Unmarshal(b, &toolList); err != nil {
 		return nil, err
 	}
-	return toolList, nil
+	return utils.ValidTools(toolList), nil
 }
 
 // ListToolsAndEnv prints the list of tools

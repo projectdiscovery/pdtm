@@ -12,6 +12,9 @@ import (
 
 // Remove removes given tool
 func Remove(path string, tool types.Tool) error {
+	if err := types.ValidateToolName(tool.Name); err != nil {
+		return err
+	}
 	executablePath, exists := ospath.GetExecutablePath(path, tool.Name)
 	if exists {
 		gologger.Info().Msgf("removing %s...", tool.Name)
