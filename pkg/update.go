@@ -16,6 +16,9 @@ import (
 
 // Update updates a given tool
 func Update(path string, tool types.Tool, disableChangeLog bool) error {
+	if err := types.ValidateToolName(tool.Name); err != nil {
+		return err
+	}
 	if executablePath, exists := ospath.GetExecutablePath(path, tool.Name); exists {
 		if isUpToDate(tool, path) {
 			return types.ErrIsUpToDate
