@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/charmbracelet/glamour"
@@ -26,12 +27,25 @@ func Update(path string, tool types.Tool, disableChangeLog bool) error {
 			return fmt.Errorf(types.ErrNoAssetFound, tool.Name, executablePath)
 		}
 
-		if err := os.Remove(executablePath); err != nil {
+		// install into a temporary directory first: the installed binary
+		// is replaced only when the new one is downloaded and extracted
+		tmpDir, err := os.MkdirTemp(path, ".pdtm-update-")
+		if err != nil {
 			return err
 		}
+		defer func() {
+			_ = os.RemoveAll(tmpDir)
+		}()
 
-		version, err := install(tool, path)
+		version, err := install(tool, tmpDir)
 		if err != nil {
+			return err
+		}
+		newPath, exists := ospath.GetExecutablePath(tmpDir, tool.Name)
+		if !exists {
+			return fmt.Errorf("%s binary not found in release asset", tool.Name)
+		}
+		if err := os.Rename(newPath, filepath.Join(path, filepath.Base(newPath))); err != nil {
 			return err
 		}
 		if !disableChangeLog {
