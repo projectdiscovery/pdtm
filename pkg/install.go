@@ -119,8 +119,8 @@ loop:
 			gologger.Warning().Msgf("Error closing response body: %s", err)
 		}
 	}()
-	if resp.StatusCode != 200 {
-		return "", err
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("could not download %s asset: unexpected status %d", tool.Name, resp.StatusCode)
 	}
 
 	switch {
@@ -144,6 +144,7 @@ func downloadTar(reader io.Reader, toolName, path string) error {
 		return err
 	}
 	tarReader := tar.NewReader(gzipReader)
+	found := false
 	// iterate through the files in the archive
 	for {
 		header, err := tarReader.Next()
@@ -160,7 +161,7 @@ func downloadTar(reader io.Reader, toolName, path string) error {
 		if !header.FileInfo().IsDir() {
 			filePath := filepath.Join(path, header.FileInfo().Name())
 			if !strings.HasPrefix(filePath, filepath.Clean(path)+string(os.PathSeparator)) {
-				return err
+				return fmt.Errorf("invalid file path in archive: %s", header.FileInfo().Name())
 			}
 
 			if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
@@ -186,7 +187,11 @@ func downloadTar(reader io.Reader, toolName, path string) error {
 			if err != nil {
 				return err
 			}
+			found = true
 		}
+	}
+	if !found {
+		return fmt.Errorf("%s binary not found in release asset", toolName)
 	}
 	return nil
 }
@@ -201,13 +206,14 @@ func downloadZip(reader io.Reader, toolName, path string) error {
 	if err != nil {
 		return err
 	}
+	found := false
 	for _, f := range zipReader.File {
 		if !strings.EqualFold(strings.TrimSuffix(f.Name, extIfFound), toolName) {
 			continue
 		}
 		filePath := filepath.Join(path, f.Name)
 		if !strings.HasPrefix(filePath, filepath.Clean(path)+string(os.PathSeparator)) {
-			return err
+			return fmt.Errorf("invalid file path in archive: %s", f.Name)
 		}
 
 		if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
@@ -238,6 +244,10 @@ func downloadZip(reader io.Reader, toolName, path string) error {
 		if err := fileInArchive.Close(); err != nil {
 			gologger.Warning().Msgf("Error closing file in archive: %s", err)
 		}
+		found = true
+	}
+	if !found {
+		return fmt.Errorf("%s binary not found in release asset", toolName)
 	}
 	return nil
 }
