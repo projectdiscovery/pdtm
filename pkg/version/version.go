@@ -26,6 +26,9 @@ var (
 )
 
 func ExtractInstalledVersion(tool types.Tool, basePath string) (string, error) {
+	if err := types.ValidateToolName(tool.Name); err != nil {
+		return "", err
+	}
 	toolPath := filepath.Join(basePath, tool.Name)
 
 	var lastErr error

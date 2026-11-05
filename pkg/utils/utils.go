@@ -56,7 +56,7 @@ func FetchToolList() ([]types.Tool, error) {
 		if err != nil {
 			return nil, err
 		}
-		return tools, nil
+		return ValidTools(tools), nil
 	}
 	return nil, nil
 }
@@ -101,9 +101,25 @@ func fetchTool(toolName string) (types.Tool, error) {
 		if err != nil {
 			return tool, err
 		}
+		if err := types.ValidateToolName(tool.Name); err != nil {
+			return types.Tool{}, err
+		}
 		return tool, nil
 	}
 	return tool, nil
+}
+
+// ValidTools drops the tools whose name is not safe to use as a file name.
+func ValidTools(tools []types.Tool) []types.Tool {
+	valid := make([]types.Tool, 0, len(tools))
+	for _, tool := range tools {
+		if !types.IsValidToolName(tool.Name) {
+			gologger.Warning().Msgf("skipping tool with invalid name %q", tool.Name)
+			continue
+		}
+		valid = append(valid, tool)
+	}
+	return valid
 }
 
 func Contains(s []types.Tool, toolName string) (int, bool) {

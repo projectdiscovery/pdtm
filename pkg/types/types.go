@@ -1,12 +1,16 @@
 package types
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 const Organization = "projectdiscovery"
 
 var (
-	ErrIsInstalled = errors.New("already installed")
-	ErrIsUpToDate  = errors.New("already up to date")
+	ErrIsInstalled     = errors.New("already installed")
+	ErrIsUpToDate      = errors.New("already up to date")
+	ErrInvalidToolName = errors.New("invalid tool name")
 
 	ErrNoAssetFound = "could not find release asset for your platform (%s/%s)"
 	ErrToolNotFound = "%s: tool not found in path %s: skipping"
@@ -44,4 +48,32 @@ type ToolRequirementSpecification struct {
 type NucleiData struct {
 	IgnoreHash string `json:"ignore-hash"`
 	Tools      []Tool `json:"tools"`
+}
+
+// IsValidToolName reports whether name is safe to use as a file name in the
+// install path: letters, digits, '-' and '_', starting with a letter or a
+// digit. Tool names come from the pdtm API or its cache file, and a path
+// separator or ".." would reach files outside the install path.
+func IsValidToolName(name string) bool {
+	if name == "" {
+		return false
+	}
+	for i := 0; i < len(name); i++ {
+		c := name[i]
+		switch {
+		case c >= 'a' && c <= 'z', c >= 'A' && c <= 'Z', c >= '0' && c <= '9':
+		case (c == '-' || c == '_') && i > 0:
+		default:
+			return false
+		}
+	}
+	return true
+}
+
+// ValidateToolName returns ErrInvalidToolName for a name that is not safe.
+func ValidateToolName(name string) error {
+	if !IsValidToolName(name) {
+		return fmt.Errorf("%w: %q", ErrInvalidToolName, name)
+	}
+	return nil
 }
