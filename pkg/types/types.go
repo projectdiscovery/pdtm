@@ -11,6 +11,7 @@ var (
 	ErrIsInstalled     = errors.New("already installed")
 	ErrIsUpToDate      = errors.New("already up to date")
 	ErrInvalidToolName = errors.New("invalid tool name")
+	ErrInvalidRepoName = errors.New("invalid repo name")
 
 	ErrNoAssetFound = "could not find release asset for your platform (%s/%s)"
 	ErrToolNotFound = "%s: tool not found in path %s: skipping"
@@ -74,6 +75,18 @@ func IsValidToolName(name string) bool {
 func ValidateToolName(name string) error {
 	if !IsValidToolName(name) {
 		return fmt.Errorf("%w: %q", ErrInvalidToolName, name)
+	}
+	return nil
+}
+
+// ValidateTool checks the name and the repo of a tool. The repo is put in
+// GitHub API paths, and a ".." there selects a repo of another owner.
+func ValidateTool(tool Tool) error {
+	if err := ValidateToolName(tool.Name); err != nil {
+		return err
+	}
+	if !IsValidToolName(tool.Repo) {
+		return fmt.Errorf("%w: %q", ErrInvalidRepoName, tool.Repo)
 	}
 	return nil
 }

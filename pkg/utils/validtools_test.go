@@ -8,8 +8,14 @@ import (
 )
 
 func TestValidToolsDropsInvalidNames(t *testing.T) {
-	tools := ValidTools([]types.Tool{{Name: "nuclei"}, {Name: "../../../other-dir/important.txt"}, {Name: "httpx"}})
+	tools := ValidTools([]types.Tool{{Name: "nuclei", Repo: "nuclei"}, {Name: "../../../other-dir/important.txt", Repo: "x"}, {Name: "httpx", Repo: "httpx"}})
 	require.Len(t, tools, 2)
 	require.Equal(t, "nuclei", tools[0].Name)
 	require.Equal(t, "httpx", tools[1].Name)
+}
+
+func TestValidToolsDropsInvalidRepos(t *testing.T) {
+	tools := ValidTools([]types.Tool{{Name: "nuclei", Repo: "nuclei"}, {Name: "httpx", Repo: "../attacker/evil"}})
+	require.Len(t, tools, 1)
+	require.Equal(t, "nuclei", tools[0].Name)
 }

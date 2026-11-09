@@ -101,7 +101,7 @@ func fetchTool(toolName string) (types.Tool, error) {
 		if err != nil {
 			return tool, err
 		}
-		if err := types.ValidateToolName(tool.Name); err != nil {
+		if err := types.ValidateTool(tool); err != nil {
 			return types.Tool{}, err
 		}
 		return tool, nil
@@ -109,12 +109,13 @@ func fetchTool(toolName string) (types.Tool, error) {
 	return tool, nil
 }
 
-// ValidTools drops the tools whose name is not safe to use as a file name.
+// ValidTools drops the tools whose name is not safe to use as a file name
+// or whose repo is not a plain repo name.
 func ValidTools(tools []types.Tool) []types.Tool {
 	valid := make([]types.Tool, 0, len(tools))
 	for _, tool := range tools {
-		if !types.IsValidToolName(tool.Name) {
-			gologger.Warning().Msgf("skipping tool with invalid name %q", tool.Name)
+		if err := types.ValidateTool(tool); err != nil {
+			gologger.Warning().Msgf("skipping tool: %s", err)
 			continue
 		}
 		valid = append(valid, tool)

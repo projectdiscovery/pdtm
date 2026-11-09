@@ -32,7 +32,7 @@ var (
 
 // Install installs given tool at path
 func Install(path string, tool types.Tool) error {
-	if err := types.ValidateToolName(tool.Name); err != nil {
+	if err := types.ValidateTool(tool); err != nil {
 		return err
 	}
 	if _, exists := ospath.GetExecutablePath(path, tool.Name); exists {
@@ -50,7 +50,7 @@ func Install(path string, tool types.Tool) error {
 
 // GoInstall installs given tool at path
 func GoInstall(path string, tool types.Tool) error {
-	if err := types.ValidateToolName(tool.Name); err != nil {
+	if err := types.ValidateTool(tool); err != nil {
 		return err
 	}
 	if _, exists := ospath.GetExecutablePath(path, tool.Name); exists {
